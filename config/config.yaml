@@ -1,0 +1,9 @@
+port: 8080
+harmony_api:
+  url: http://10.86.0.10:8282
+  hubs:
+  - name: bedroom
+    activities:
+      - watch-tv
+  default_hub: bedroom
+  default_activity: watch-tv

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Slinky</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body onload="checkStatus()">
+<h1>Slinky</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-xs-12">
+            Video goes here
+        </div>
+        <div class="col" id="remote">
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-10">
+                    <button type="button" class="btn btn-success" id="power">⚡ Power</button>
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary" id="mute">🔇</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-3 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="rewind">⏪</button>
+                </div>
+                <div class="col-6 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="play">▶️⏸</button>
+                </div>
+                <div class="col-3 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="fast-forward">⏩</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-5 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary input-block-level" id="channel-up">⬆ Ch
+                    </button>
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    &nbsp;
+                </div>
+                <div class="col-5 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary input-block-level" id="volume-up">➕ Vol
+                    </button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-5 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary" id="channel-down">⬇ Ch️</button>
+                </div>
+                <div class="col-2 d-flex justify-content-center">
+                    &nbsp;
+                </div>
+                <div class="col-5 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary" id="volume-down">➖ Vol</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-12 d-flex justify-content-center">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" placeholder="Ch" aria-label="Channel"
+                               aria-describedby="ch" id="channel">
+                        <button class="btn btn-outline-primary" type="button" id="ch">Go</button>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-4  my-auto  d-flex justify-content-center">
+                </div>
+                <div class="col-4  my-auto  d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary" id="direction-up">↑</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col-4  my-auto  d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary  btn-block" id="direction-left">←</button>
+                </div>
+                <div class="col-4 my-auto  d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary  btn-block" id="select">OK</button>
+                </div>
+                <div class="col-4  my-auto  d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="direction-right">→</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-4 d-flex justify-content-center">
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="direction-down">↓</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-6 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="menu">Menu</button>
+                </div>
+                <div class="col-6 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="return">Back</button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 15px;">
+                <div class="col-6 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="record">Record</button>
+                </div>
+                <div class="col-6 d-flex justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-block" id="search">Search</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3  d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger" id="red">&nbsp;</button>
+                </div>
+                <div class="col-3  d-flex justify-content-center">
+                    <button type="button" class="btn btn-success" id="green">&nbsp;</button>
+                </div>
+                <div class="col-3  d-flex justify-content-center">
+                    <button type="button" class="btn btn-warning" id="yellow">&nbsp;</button>
+                </div>
+                <div class="col-3  d-flex justify-content-center">
+                    <button type="button" class="btn btn-info" id="blue">&nbsp;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+<script>
+    const remoteCtrl = document.getElementById('remote');
+    const apiRoot = "/api/v1"
+    const call = apiRoot + "/call"
+    const pwrStatus = apiRoot + "/pwr";
+
+    const pwrButton = document.getElementById("power");
+    const channel = document.getElementById("channel")
+
+    // Check power status
+    const interval = setInterval(function () {
+        checkStatus()
+    }, 10000)
+
+    function checkStatus() {
+        const xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", pwrStatus, false); // false for synchronous request
+        xmlHttp.send(null);
+        const resp = JSON.parse(xmlHttp.responseText)
+        const pwrClass = pwrButton.classList;
+        if (resp.off === false) {
+            pwrClass.add("btn-danger")
+            pwrClass.remove("btn-success")
+        } else {
+            pwrClass.add("btn-success")
+            pwrClass.remove("btn-danger")
+        }
+    }
+
+    function sendCmd(cmd) {
+        const xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", call + "/" + cmd, false); // false for synchronous request
+        xmlHttp.send(null);
+        checkStatus();
+    }
+
+    remoteCtrl.addEventListener('click', (event) => {
+        const isButton = event.target.nodeName === 'BUTTON';
+        if (!isButton) {
+            return;
+        }
+        console.dir(event.target.id);
+        if (event.target.id === "ch") {
+            console.log("Change channel");
+        } else {
+            // Send the raw request
+            sendCmd(event.target.id)
+        }
+    })
+
+    channel.addEventListener('keypress', (event) => {
+            if (event.key === "Enter") {
+                //console.log(channel.value)
+                // Split channel input into separate values
+                const nums = channel.value.toString().split('');
+
+                for (let i = 0; i < nums.length; i++) {
+                    sendCmd(nums[i])
+                    sleep(500);
+                }
+            }
+        }
+    )
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+</script>
+</body>
+</html>
