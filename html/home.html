@@ -16,9 +16,11 @@
             /*background: #e5e5e5;*/
             border-radius: 30px;
         }
+
         #remote button span {
             font-size: 80%;
         }
+
         .small_icon {
             font-size: 6px;
         }
@@ -29,19 +31,15 @@
 <div class="container">
     <div class="row">
         <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-xs-12">
-            <video id="slinky-video" class="video-js" controls preload="auto" width="640" height="264"
-                   poster="MY_VIDEO_POSTER.jpg" data-setup="{}">
-                <source
-                        src="http://localhost:8081/video"
-                        type="application/x-mpegURL">
-                <p class="vjs-no-js">
-                    To view this video please enable JavaScript, and consider upgrading to a
-                    web browser that
-                    <a href="https://videojs.com/html5-video-support/" target="_blank"
-                    >supports HTML5 video</a
-                    >
-                </p>
-            </video>
+            <div class="embed-responsive embed-responsive-16by9">
+                <video id="slinky-video" class="video-js embed-responsive-item col-12" controls autoplay muted data-setup='{ "controls": true, "autoplay": true, "preload": "auto"'>
+                    <source src="{{.Stream.HQ}}" type="application/x-mpegURL">
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                    </p>
+                </video>
+            </div>
 
         </div>
         <div class="col" id="remote">
@@ -150,12 +148,12 @@
             <div class="row align-items-center justify-content-center mb-2">
                 <div class="col-6 justify-content-center m-0 p-1">
                     <button type="button" class="btn btn-outline-secondary col-12" id="menu">
-                        <i class="fas fa-bars"></i><br /><span class="desc">Menu</span>
+                        <i class="fas fa-bars"></i><br/><span class="desc">Menu</span>
                     </button>
                 </div>
                 <div class="col-6 ms-auto justify-content-center m-0 p-1">
                     <button type="button" class="btn btn-outline-secondary col-12" id="return">
-                        <i class="fa-solid fa-arrow-rotate-left"></i><br /><span class="desc">Back</span>
+                        <i class="fa-solid fa-arrow-rotate-left"></i><br/><span class="desc">Back</span>
                     </button>
                 </div>
             </div>

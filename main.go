@@ -8,6 +8,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
 var cfg Config
@@ -32,7 +34,6 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 		return
 	}
-
 	r := mux.NewRouter()
 	r.HandleFunc("/", home).Methods("GET")
 	api := r.PathPrefix("/api").Subrouter()
@@ -40,6 +41,17 @@ func main() {
 	api.HandleFunc("/v1/pwr", pwStatus).Methods("GET")
 	api.HandleFunc("/v1/call/power", togglePower).Methods("GET")
 	api.HandleFunc("/v1/call/{call}", apiCall).Methods("GET")
+
+	if cfg.Dev.Enabled {
+		proxy, err := NewProxy("/0.m3u8")
+		if err != nil {
+			panic(err)
+		}
+		dev := r.PathPrefix("/").Subrouter()
+		dev.HandleFunc("/{.*\\.m3u8}", ProxyRequestHandler(proxy))
+		dev.HandleFunc("/{.*\\.ts}", ProxyRequestHandler(proxy))
+	}
+
 	log.Printf("Startup Complete, listening on port %v\n", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
 }
@@ -53,7 +65,7 @@ func apiHandler(next http.Handler) http.Handler {
 
 func home(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.New("home.html").ParseFiles("html/home.html"))
-	err := t.Execute(w, nil)
+	err := t.Execute(w, cfg)
 	if err != nil {
 		log.Printf("Error rendering page: %v\n", err)
 		return
@@ -125,4 +137,30 @@ func apiCall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = json.NewEncoder(w).Encode(status)
+}
+
+// NewProxy takes target host and creates a reverse proxy
+func NewProxy(path string) (*httputil.ReverseProxy, error) {
+	url, err := url.Parse(fmt.Sprintf("%v", cfg.Dev.Stream))
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Url: %v\n", url)
+
+	proxy := httputil.NewSingleHostReverseProxy(url)
+
+	originalDirector := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		originalDirector(req)
+	}
+
+	return proxy, nil
+}
+
+// ProxyRequestHandler handles the http request using proxy
+func ProxyRequestHandler(proxy *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		proxy.ServeHTTP(w, r)
+	}
 }
