@@ -7,9 +7,9 @@ harmony_api:
       - watch-tv
   default_hub: kitchen
   default_activity: watch-tv
-dev:
-  enabled: false
-  stream: http://10.86.0.20:8086
 stream:
   hq: /stream/1.m3u8
   fast: /stream/1.ts
+dev:
+  enabled: false
+  stream: http://10.86.0.20:8086

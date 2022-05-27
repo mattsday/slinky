@@ -35,7 +35,10 @@ func main() {
 		return
 	}
 	r := mux.NewRouter()
+	s := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
 	r.HandleFunc("/", home).Methods("GET")
+	r.HandleFunc("/video", video).Methods("GET")
+	r.PathPrefix("/html/static/").Handler(s)
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(apiHandler)
 	api.HandleFunc("/v1/pwr", pwStatus).Methods("GET")
@@ -64,7 +67,16 @@ func apiHandler(next http.Handler) http.Handler {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.New("home.html").ParseFiles("html/home.html"))
+	t := template.Must(template.New("home.html").ParseFiles("html/home.html", "html/remote.html"))
+	err := t.Execute(w, cfg)
+	if err != nil {
+		log.Printf("Error rendering page: %v\n", err)
+		return
+	}
+}
+
+func video(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.New("video.html").ParseFiles("html/video.html", "html/remote.html"))
 	err := t.Execute(w, cfg)
 	if err != nil {
 		log.Printf("Error rendering page: %v\n", err)

@@ -1,0 +1,12 @@
+version: "3.0"
+services:
+  harmonyapi:
+    image: mattsday/harmonyapi
+    build: <path-to-source>
+    container_name: harmonyapi
+    environment:
+      - TZ=Europe/London
+    volumes:
+      - <path-to-config>:/config
+    network_mode: host
+    restart: unless-stopped

@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  slinky:
+    image: mattsday/slinky
+    build: <path-to-source>
+    container_name: slinky
+    environment:
+      - TZ=Europe/London
+      # Provide config either here, or in the config.yaml file
+      - HARMONY_API.URL=http://<url>:8282
+      - HUBS.DEFAULT_HUB=<hub>
+      - HUBS.DEFAULT_ACTIVITY=<activity>
+    restart: unless-stopped
