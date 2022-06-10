@@ -18,9 +18,11 @@ function checkStatus() {
     const resp = JSON.parse(xmlHttp.responseText)
     const pwrClass = pwrButton.classList;
     if (resp.off === false) {
+        toggleEnabled(true);
         pwrClass.add("btn-danger")
         pwrClass.remove("btn-success")
     } else {
+        toggleEnabled(false);
         pwrClass.add("btn-success")
         pwrClass.remove("btn-danger")
     }
@@ -41,7 +43,6 @@ remoteCtrl.addEventListener('click', (event) => {
         // If it's one of the icons, process its parent
         id = event.target.parentElement.id;
     } else {
-        console.log("Returning!")
         return
     }
     if (id === "ch") {
@@ -65,6 +66,16 @@ function channelInput() {
     for (let i = 0; i < nums.length; i++) {
         sendCmd(nums[i])
         sleep(500);
+    }
+}
+
+function toggleEnabled(enabled) {
+    const elements = remoteCtrl.getElementsByTagName('button')
+    for (let i = 0; i < elements.length; i++) {
+        if (elements[i].id !== "power") {
+            //elements[i].removeAttribute("style");
+            elements[i].disabled = !enabled;
+        }
     }
 }
 

@@ -46,6 +46,7 @@ func main() {
 	api.HandleFunc("/v1/call/{call}", apiCall).Methods("GET")
 
 	if cfg.Dev.Enabled {
+		log.Println("Warning: Dev mode enabled")
 		proxy, err := NewProxy("/0.m3u8")
 		if err != nil {
 			panic(err)
@@ -158,7 +159,7 @@ func NewProxy(path string) (*httputil.ReverseProxy, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Url: %v\n", url)
+	log.Printf("Dev Url: %v\n", url)
 
 	proxy := httputil.NewSingleHostReverseProxy(url)
 
