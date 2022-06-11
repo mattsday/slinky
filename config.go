@@ -22,7 +22,13 @@ type Dev struct {
 	Enabled bool   `mapstructure:"enabled"`
 	Stream  string `mapstructure:"stream"`
 }
+
 type Stream struct {
-	HQ     string `mapstructure:"hq"`
-	Stable string `mapstructure:"stable"`
+	Quality []Quality `mapstructure:"quality"`
+}
+
+type Quality struct {
+	Name     string `mapstructure:"name"`
+	Location string `mapstructure:"location"`
+	Default  bool   `mapstructure:"default"`
 }

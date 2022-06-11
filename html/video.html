@@ -5,9 +5,12 @@
     <meta content="width=device-width, initial-scale=1" name="viewport">
 
     <title>Slinky</title>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
-    <link href="https://vjs.zencdn.net/7.19.2/video-js.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+          integrity="sha512-GQGU0fMMi238uA+a/bdWJfpUGKUkBdgfFdgBm72SUQ6BeyWjoY/ton0tEjH+OSH9iP4Dfh+7HM0I9f5eR0L/4w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.1/video-js.min.css"
+          integrity="sha512-D/n19dhr+LY8HOoGuybX+bJYsZOFKb0r7YpAWBMPg5Hnke6lxdHl6q21d7qiwIsMgdSnBG9pSMQlwTtZ+6ISmw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
           integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
           referrerpolicy="no-referrer" rel="stylesheet"/>
@@ -26,32 +29,40 @@
         }
     </style>
 </head>
-<body onload="checkStatus()">
+<body onload="checkStatus(); initVideo();">
 <h1>Slinky</h1>
 <div class="container">
     <div class="row">
         <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-xs-12">
             <div class="embed-responsive embed-responsive-16by9">
-                <video autoplay class="video-js embed-responsive-item col-12" controls data-setup='{ "controls": true, "autoplay": true, "preload": "auto"' id="slinky-video" muted>
-                    <source src="{{.Stream.HQ}}" type="application/x-mpegURL">
-                    <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a web browser that
-                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-                    </p>
-                </video>
+                <video-js id=slinky-video class="vjs-default-skin video-js embed-responsive-item col-12" controls muted>
+                </video-js>
             </div>
+            <select class="form-select" aria-label="Video Quality" id="quality">
+                {{range $i, $a := .Stream.Quality}}
+                    <option value="{{$a.Location}}" {{if $a.Default}} selected {{end}}>Quality: {{$a.Name}}</option>
+                {{end}}
+            </select>
         </div>
         {{template "remote.html" .}}
     </div>
 
 </div>
 
-
-<script crossorigin="anonymous"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.5/umd/popper.min.js"
+        integrity="sha512-8cU710tp3iH9RniUh6fq5zJsGnjLzOWLWdZqBMLtqaoZUA6AWIE34lwMB3ipUNiTBP5jEZKY95SfbNnQ8cCKvA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"
+        integrity="sha512-OvBgP9A2JBgiRad/mM36mkzXSXaJE9BEIENnVEmeZdITvwT09xnxLtT4twkCa8m/loMbPHsvPl0T8lRGVBwjlQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.1/video.min.js"
+        integrity="sha512-xT61DWoPRoAa4ir+LqER5L4/zzuO5tQOQywZYqU8BaZVqolq78bRobozDxozcCZ6tmo92zetGVQHRp+sQHIi/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-quality-levels/2.1.0/videojs-contrib-quality-levels.min.js"
+        referrerpolicy="no-referrer"></script>
 <script src="/html/static/slinky.js"></script>
-<script src="https://vjs.zencdn.net/7.19.2/video.min.js"></script>
+<script>
+
+</script>
 </body>
 </html>

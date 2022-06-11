@@ -25,6 +25,17 @@ func loadCfg() (err error) {
 		log.Printf("Error loading config: %v", err)
 		return err
 	}
+	if cfg.Dev.Enabled {
+		viper.SetConfigName("config-dev")
+		viper.AddConfigPath("config")
+		if err = viper.MergeInConfig(); err != nil {
+			log.Printf("Warning: %v\n", err)
+		}
+		if err := viper.Unmarshal(&cfg); err != nil {
+			log.Printf("Error loading config: %v", err)
+			return err
+		}
+	}
 	return nil
 }
 
@@ -47,7 +58,7 @@ func main() {
 
 	if cfg.Dev.Enabled {
 		log.Println("Warning: Dev mode enabled")
-		proxy, err := NewProxy("/0.m3u8")
+		proxy, err := NewProxy("/0.mF3u8")
 		if err != nil {
 			panic(err)
 		}

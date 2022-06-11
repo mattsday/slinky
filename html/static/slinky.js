@@ -69,6 +69,26 @@ function channelInput() {
     }
 }
 
+
+function initVideo() {
+    const player = videojs('slinky-video');
+    const source = document.getElementById("quality");
+    source.addEventListener('change', (event) => {
+        player.source = event.target.value;
+        player.src({type: 'application/x-mpegURL', src: event.target.value});
+        player.play();
+    });
+    player.qualityLevels();
+    /*
+    player.qualityLevels().on('addqualitylevel', (event) => {
+        const qualityLevel = event.qualityLevel;
+        qualityLevel.enabled = qualityLevel.bitrate >= 496000;
+    });
+     */
+    player.src({type: 'application/x-mpegURL', src: source.value});
+    player.play();
+}
+
 function toggleEnabled(enabled) {
     const elements = remoteCtrl.getElementsByTagName('button')
     for (let i = 0; i < elements.length; i++) {
