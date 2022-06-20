@@ -47,14 +47,15 @@ func main() {
 	}
 	r := mux.NewRouter()
 	s := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
-	r.HandleFunc("/", home).Methods("GET")
-	r.HandleFunc("/video", video).Methods("GET")
+	r.HandleFunc("/", home).Methods(http.MethodGet)
+	r.HandleFunc("/video", video).Methods(http.MethodGet)
+	r.HandleFunc("/instant.m3u8", instant).Methods(http.MethodGet)
 	r.PathPrefix("/html/static/").Handler(s)
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(apiHandler)
-	api.HandleFunc("/v1/pwr", pwStatus).Methods("GET")
-	api.HandleFunc("/v1/call/power", togglePower).Methods("GET")
-	api.HandleFunc("/v1/call/{call}", apiCall).Methods("GET")
+	api.HandleFunc("/v1/pwr", pwStatus).Methods(http.MethodGet)
+	api.HandleFunc("/v1/call/power", togglePower).Methods(http.MethodGet)
+	api.HandleFunc("/v1/call/{call}", apiCall).Methods(http.MethodGet)
 
 	if cfg.Dev.Enabled {
 		log.Println("Warning: Dev mode enabled")
@@ -65,6 +66,7 @@ func main() {
 		dev := r.PathPrefix("/").Subrouter()
 		dev.HandleFunc("/{.*\\.m3u8}", ProxyRequestHandler(proxy))
 		dev.HandleFunc("/{.*\\.ts}", ProxyRequestHandler(proxy))
+		dev.HandleFunc("/{.*\\.flv}", ProxyRequestHandler(proxy))
 	}
 
 	log.Printf("Startup Complete, listening on port %v\n", cfg.Port)
@@ -161,6 +163,13 @@ func apiCall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = json.NewEncoder(w).Encode(status)
+}
+
+func instant(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/vnd.apple.mpegurl")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("#EXTM3U\n#EXTINF:0,\n3.ts\n"))
+	return
 }
 
 // NewProxy takes target host and creates a reverse proxy

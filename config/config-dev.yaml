@@ -7,3 +7,5 @@ stream:
     - name: Low
       location: /3.m3u8
       default: true
+    - name: Instant
+      location: /3.flv
