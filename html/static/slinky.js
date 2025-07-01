@@ -72,7 +72,7 @@ function channelInput() {
 
 function initVideo() {
     if (mpegts.isSupported()) {
-        var videoElement = document.getElementById('videoPlayer');
+        var videoElement = document.getElementById('slinky-video');
         const source = document.getElementById("quality");
         const player = mpegts.createPlayer({
             type: 'mpegts',
