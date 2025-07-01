@@ -69,25 +69,43 @@ function channelInput() {
     }
 }
 
+// Keep the player variable in a scope accessible by your functions
+let player;
+const videoElement = document.getElementById('slinky-video');
+const sourceDropdown = document.getElementById("quality");
+
+// 1. Create a function to change the stream
+function changeStream(url) {
+    // If a player instance already exists, destroy it
+    if (player) {
+        player.destroy();
+    }
+
+    // Create a new player with the new URL
+    player = mpegts.createPlayer({
+        type: 'mpegts',
+        isLive: true,
+        url: url // Use the URL passed to the function
+    });
+
+    // Attach, load, and play
+    player.attachMediaElement(videoElement);
+    player.load();
+    player.play();
+}
 
 function initVideo() {
     if (mpegts.isSupported()) {
-        var videoElement = document.getElementById('slinky-video');
         const source = document.getElementById("quality");
-        const player = mpegts.createPlayer({
-            type: 'mpegts',
-            isLive: true,
-            url: '/stream/1.ts'
-        });
+        // Add the event listener to the dropdown
         source.addEventListener('change', (event) => {
-            player.source = event.target.value;
-            player.src = event.target.value;
-            player.play();
+            changeStream(event.target.value);
         });
 
-        player.attachMediaElement(videoElement);
-        player.load();
-        player.play();
+        // 3. Load the initial stream using the dropdown's current value
+        changeStream(sourceDropdown.value);
+    } else {
+        console.error("mpegts.js is not supported in this browser.");
     }
 }
 
