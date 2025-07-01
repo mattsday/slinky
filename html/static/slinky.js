@@ -96,9 +96,8 @@ function changeStream(url) {
 
 function initVideo() {
     if (mpegts.isSupported()) {
-        const source = document.getElementById("quality");
         // Add the event listener to the dropdown
-        source.addEventListener('change', (event) => {
+        sourceDropdown.addEventListener('change', (event) => {
             changeStream(event.target.value);
         });
 
