@@ -71,22 +71,24 @@ function channelInput() {
 
 
 function initVideo() {
-    const player = videojs('slinky-video');
-    const source = document.getElementById("quality");
-    source.addEventListener('change', (event) => {
-        player.source = event.target.value;
-        player.src({type: 'application/x-mpegURL', src: event.target.value});
+    if (mpegts.isSupported()) {
+        var videoElement = document.getElementById('videoPlayer');
+        const source = document.getElementById("quality");
+        const player = mpegts.createPlayer({
+            type: 'mpegts',
+            isLive: true,
+            url: '/stream/1.ts'
+        });
+        source.addEventListener('change', (event) => {
+            player.source = event.target.value;
+            player.src = event.target.value;
+            player.play();
+        });
+
+        player.attachMediaElement(videoElement);
+        player.load();
         player.play();
-    });
-    player.qualityLevels();
-    /*
-    player.qualityLevels().on('addqualitylevel', (event) => {
-        const qualityLevel = event.qualityLevel;
-        qualityLevel.enabled = qualityLevel.bitrate >= 496000;
-    });
-     */
-    player.src({type: 'application/x-mpegURL', src: source.value});
-    player.play();
+    }
 }
 
 function toggleEnabled(enabled) {
