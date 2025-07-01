@@ -9,13 +9,15 @@ harmony_api:
   default_activity: watch-tv
 stream:
   quality:
-    - name: High
-      location: /stream/1.m3u8
-    - name: Medium
-      location: /stream/2.m3u8
-    - name: Low
-      location: /stream/2.m3u8
+    - name: Very High
+      location: /0.ts
       default: true
+    - name: High
+      location: /1.ts
+    - name: Medium
+      location: /2.ts
+    - name: Low
+      location: /3.ts
 dev:
   enabled: false
   stream: http://10.86.0.20:8086
