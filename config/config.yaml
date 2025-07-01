@@ -10,14 +10,14 @@ harmony_api:
 stream:
   quality:
     - name: Very High
-      location: /0.ts
+      location: /stream/0.ts
       default: true
     - name: High
-      location: /1.ts
+      location: /stream/1.ts
     - name: Medium
-      location: /2.ts
+      location: /stream/2.ts
     - name: Low
-      location: /3.ts
+      location: /stream/3.ts
 dev:
   enabled: false
   stream: http://10.86.0.20:8086
