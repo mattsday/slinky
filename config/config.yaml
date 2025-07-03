@@ -1,4 +1,8 @@
 port: 8080
+control: harmony
+sky_q:
+  host: 10.86.0.205
+  port: 49160
 harmony_api:
   url: http://10.86.0.10:8282
   hubs:

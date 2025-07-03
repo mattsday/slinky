@@ -9,3 +9,6 @@ stream:
       location: /2.ts
     - name: Low
       location: /3.ts
+sky_q:
+  host: 10.86.0.205
+  port: 49160
