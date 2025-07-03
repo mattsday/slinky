@@ -1,3 +1,9 @@
+// This is the modern replacement for onload
+document.addEventListener('DOMContentLoaded', () => {
+    checkStatus();
+    initVideo();
+});
+
 const remoteCtrl = document.getElementById('remote');
 const apiRoot = "/api/v1"
 const call = apiRoot + "/call"
