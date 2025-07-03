@@ -129,3 +129,29 @@ function sleep(ms) {
 }
 
 window.HELP_IMPROVE_VIDEOJS = false;
+
+// Casting support
+
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('slinky-video');
+    const castButton = document.getElementById('castButton');
+
+    // Check if the browser supports the Remote Playback API
+    if ('remote' in video) {
+        // Watch for available casting devices
+        video.remote.watchAvailability((isAvailable) => {
+            // Show the cast button only if devices are found
+            castButton.style.display = isAvailable ? 'block' : 'none';
+        }).catch(() => {
+            // Handle potential errors
+            castButton.style.display = 'none';
+        });
+
+        // When the cast button is clicked, open the device picker
+        castButton.addEventListener('click', () => {
+            video.remote.prompt().catch((error) => {
+                console.error('Error opening remote playback prompt:', error);
+            });
+        });
+    }
+});

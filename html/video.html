@@ -23,9 +23,7 @@
     <h1>Slinky</h1>
     <div class="container">
       <div class="row">
-        <div
-          class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12"
-        >
+        <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12">
           <div class="ratio ratio-16x9">
             <video
               id="slinky-video"
@@ -33,7 +31,9 @@
               autoplay
               muted
               class="ratio-item"
+              x-webkit-airplay="allow"
             ></video>
+            <button id="castButton" style="display: none">Cast Video</button>
           </div>
           <select class="form-select" aria-label="Video Quality" id="quality">
             {{range $i, $a := .Stream.Quality}}
