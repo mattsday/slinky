@@ -50,6 +50,7 @@ func main() {
 	s := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
 	r.HandleFunc("/", home).Methods(http.MethodGet)
 	r.HandleFunc("/video", video).Methods(http.MethodGet)
+	r.HandleFunc("/remote", remote).Methods(http.MethodGet)
 	r.HandleFunc("/instant.m3u8", instant).Methods(http.MethodGet)
 	r.PathPrefix("/html/static/").Handler(s)
 	api := r.PathPrefix("/api").Subrouter()
@@ -82,7 +83,7 @@ func apiHandler(next http.Handler) http.Handler {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.New("home.html").ParseFiles("html/home.html", "html/remote.html"))
+	t := template.Must(template.New("video.html").ParseFiles("html/video.html", "html/remote.html"))
 	err := t.Execute(w, cfg)
 	if err != nil {
 		log.Printf("Error rendering page: %v\n", err)
@@ -92,6 +93,15 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func video(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.New("video.html").ParseFiles("html/video.html", "html/remote.html"))
+	err := t.Execute(w, cfg)
+	if err != nil {
+		log.Printf("Error rendering page: %v\n", err)
+		return
+	}
+}
+
+func remote(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.New("remote-home.html").ParseFiles("html/remote-home.html", "html/remote.html"))
 	err := t.Execute(w, cfg)
 	if err != nil {
 		log.Printf("Error rendering page: %v\n", err)
