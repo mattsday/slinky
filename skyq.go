@@ -1,3 +1,5 @@
+// Heavily borrowed (generated) from https://github.com/dalhundal/sky-remote
+
 package main
 
 import (
@@ -6,7 +8,7 @@ import (
 	"time"
 )
 
-// skyCommands maps the remote button names to their respective command codes.
+// skyCommands maps the harmony API button names to their respective command codes.
 var skyCommands = map[string]int{
 	"power":           0,
 	"select":          1,

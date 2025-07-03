@@ -8,11 +8,20 @@ I've long wanted to build my own replacement and this is kind of step #1. It's v
 
 ## Dependencies
 
+You will require a means to create the stream and a web server:
+
+1. [URayCoder HD](https://www.amazon.co.uk/gp/product/B07D78L3SZ/ref=ppx_yo_dt_b_asin_title_o01_s00) or similar product
+2. [Nginx](https://www.nginx.com/) or some kind of reverse proxy if you wish to watch video in your browser
+
+You will also need a way to control your external device - currently Slinky supports controlling [Sky TV boxes](https://www.sky.com/tv/sky-q) (a UK TV service provider) directly or sending commands via a [Logitch Harmony Hub](https://www.logitech.com/en-gb/products.html).
+
+### Additional Logitech Harmony Requirements
+
+**Note:** You only require this if you do not plan to stream from a Sky Q TV box
+
 1. [Logitch Harmony Hub](https://www.logitech.com/en-gb/products.html) - this controls the remote, activities etc
 2. [Harmony API](https://github.com/maddox/harmony-api) - a REST API to control the Harmony hub
-3. [URayCoder HD](https://www.amazon.co.uk/gp/product/B07D78L3SZ/ref=ppx_yo_dt_b_asin_title_o01_s00) or similar product
-   that streams H.264/H.265 video
-4. [Nginx](https://www.nginx.com/) or some kind of reverse proxy if you wish to watch video in your browser
+   that streams H.264/H.265 video. You can find an example docker-compose file in `samples/harmony-api/docker-compose.yaml`
 
 ## Setup
 
@@ -22,10 +31,6 @@ There are some configuration paramters you can change via `config/config.yaml` o
 
 Once running you can go to `/` for a live video view, or `/remote` for a remote control.
 
-### Harmony API
-
-The Harmony API does most of Slinky's work - you can find an example docker-compose file in `samples/harmony-api/docker-compose.yaml`
-
 ### Reverse Proxy
 
 To make this work on the internet I strongly recommend using a reverse proxy and some kind of SSO. `samples/nginx/slinky.example.conf` is a basic implementation. For my own personal use, I combine this with [Nginx SSO by Luzifer](https://github.com/Luzifer/nginx-sso).
@@ -34,11 +39,23 @@ To make this work on the internet I strongly recommend using a reverse proxy and
 
 ### Basic Config
 
-| Config | Environment Variable | Description                        | Example     |
-| ------ | -------------------- | ---------------------------------- | ----------- |
-| `port` | `PORT`               | Port for this service to listen on | `PORT=8080` |
+| Config    | Environment Variable | Description                                                                | Example        |
+| --------- | -------------------- | -------------------------------------------------------------------------- | -------------- |
+| `port`    | `PORT`               | Port for this service to listen on                                         | `PORT=8080`    |
+| `control` | `CONTROL`            | Whether Slinky controls via `harmony` or `skyq` APIs (default: `harmony`). | `CONTROL=skyq` |
+
+### Configure Sky Q
+
+**Note**: This section is optional and can be omitted if you're using a Harmony Hub (`control` set to `harmony`).
+
+| Config      | Environment Variable | Description                                                           | Example                  |
+| ----------- | -------------------- | --------------------------------------------------------------------- | ------------------------ |
+| `skyq.host` | `SKY_Q.HOST`         | Your Sky Q box's host IP address or hostname                          | `SKY_Q.HOST=10.86.0.205` |
+| `skyq.port` | `SKY_Q.PORT`         | The port to connect to your Sky Q Box (will almost always be `49160`) | `SKY_Q.PORT=49160`       |
 
 ### Configure Harmony API
+
+**Note**: This section is optional and can be omitted if you're using Sky Q (`control` set to `skyq`).
 
 Configure the [Harmony API](https://github.com/maddox/harmony-api) and how it should connect.
 
@@ -76,10 +93,14 @@ Much of the code was refactored in 2025 with the help of Gemini. Still not how I
 
 ### Wishlist
 
-#### Sky API
+#### All-in-one distribution
 
-As I use this to directly control a Sky Q box, I think I could remove the Harmony dependency and instead migrate to the Sky API ([python](https://github.com/bradwood/pyskyq) and [nodejs](https://github.com/dalhundal/sky-remote)) or have that as an alternative option. It might be more reliable / robust too.
+Something like a Docker image for a Raspberry Pi would be pretty cool for minimal setup and configuration which would include nginx and so on out of the box.
 
 #### HLS
 
 I would love this to auto-select quality and be more seamless, but it simply adds too much latency. I don't know if changes in the future will improve this. Something to keep an eye on.
+
+#### More Remote Options
+
+Would be cool to integrate into something even simpler for remote config
