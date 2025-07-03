@@ -48,10 +48,10 @@ To make this work on the internet I strongly recommend using a reverse proxy and
 
 **Note**: This section is optional and can be omitted if you're using a Harmony Hub (`control` set to `harmony`).
 
-| Config      | Environment Variable | Description                                                           | Example                  |
-| ----------- | -------------------- | --------------------------------------------------------------------- | ------------------------ |
-| `skyq.host` | `SKY_Q.HOST`         | Your Sky Q box's host IP address or hostname                          | `SKY_Q.HOST=10.86.0.205` |
-| `skyq.port` | `SKY_Q.PORT`         | The port to connect to your Sky Q Box (will almost always be `49160`) | `SKY_Q.PORT=49160`       |
+| Config       | Environment Variable | Description                                                           | Example                  |
+| ------------ | -------------------- | --------------------------------------------------------------------- | ------------------------ |
+| `sky_q.host` | `SKY_Q.HOST`         | Your Sky Q box's host IP address or hostname                          | `SKY_Q.HOST=10.86.0.205` |
+| `sky_q.port` | `SKY_Q.PORT`         | The port to connect to your Sky Q Box (will almost always be `49160`) | `SKY_Q.PORT=49160`       |
 
 ### Configure Harmony API
 
