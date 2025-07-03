@@ -3,6 +3,8 @@ import { sendCmd, checkStatus } from './api.js';
 const pwrButton = document.getElementById("power");
 const remoteCtrl = document.getElementById('remote');
 const channel = document.getElementById("channel");
+const videoElement = document.getElementById('slinky-video'); // Get the video player element
+const muteButton = document.getElementById('mute'); // Get the mute button
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -30,19 +32,51 @@ function toggleRemoteEnabled(enabled) {
   channel.disabled = !enabled;
 }
 
+// Function to update the mute button's visual state
+function updateMuteButtonStatus() {
+  if (videoElement && muteButton) {
+    muteButton.classList.toggle('btn-danger', videoElement.muted);
+  }
+}
+
 export function initRemoteControls() {
   if (!remoteCtrl) return;
+
+  // Listen for volume changes on the video to update the mute button
+  if (videoElement) {
+    videoElement.addEventListener('volumechange', updateMuteButtonStatus);
+  }
 
   remoteCtrl.addEventListener('click', async (event) => {
     const button = event.target.closest('button');
     if (!button || button.disabled) return;
 
-    if (button.id === "ch") {
+    const buttonId = button.id;
+
+    // If the video element exists and a volume/mute button is clicked
+    if (videoElement && ['volume-up', 'volume-down', 'mute'].includes(buttonId)) {
+      switch (buttonId) {
+        case 'volume-up':
+          videoElement.volume = Math.min(1, videoElement.volume + 0.1);
+          videoElement.muted = false; // Unmute when volume is changed
+          break;
+        case 'volume-down':
+          videoElement.volume = Math.max(0, videoElement.volume - 0.1);
+          videoElement.muted = false; // Unmute when volume is changed
+          break;
+        case 'mute':
+          videoElement.muted = !videoElement.muted;
+          break;
+      }
+      // No need to call updateStatus() for local volume changes
+      updateMuteButtonStatus(); // Update the button's class immediately
+    } else if (buttonId === "ch") {
       await channelInput();
     } else {
-      await sendCmd(button.id);
+      // For all other buttons, send the command to the backend
+      await sendCmd(buttonId);
+      updateStatus(); // Update Harmony status after sending a command
     }
-    updateStatus(); // Update status after every command
   });
 
   channel.addEventListener('keypress', (event) => {
@@ -65,4 +99,7 @@ export async function updateStatus() {
   pwrButton.classList.toggle("btn-success", isOff);
   pwrButton.classList.toggle("btn-danger", !isOff);
   pwrButton.ariaPressed = !isOff ? "true" : "false";
+
+  // Also update the mute button status
+  updateMuteButtonStatus();
 }
