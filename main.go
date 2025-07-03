@@ -19,6 +19,7 @@ func loadCfg() (err error) {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("config")
 	viper.AutomaticEnv()
+	viper.SetDefault("control", "harmony") // Set default config to harmy for backwards compatibility
 	if err = viper.ReadInConfig(); err != nil {
 		return err
 	}
@@ -172,27 +173,44 @@ func apiCall(w http.ResponseWriter, r *http.Request) {
 		log.Printf("No API call found\n")
 		return
 	}
-	u := fmt.Sprintf("%v/hubs/%v/commands/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, call)
-	data, err := request(r.Context(), http.MethodPost, u)
-	if err != nil {
-		http.Error(w, "Unable to issue command", http.StatusInternalServerError)
-		log.Printf("Error sending command: %v\n", err)
-		return
+	switch cfg.Control {
+	case "skyq":
+		// Use the new Sky Q function
+		err := sendSkyCommand(cfg.SkyQ.Host, cfg.SkyQ.Port, call)
+		if err != nil {
+			http.Error(w, "Unable to send Sky Q command", http.StatusInternalServerError)
+			log.Printf("Error sending Sky Q command: %v\n", err)
+			return
+		}
+		// Return a simple success response
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"message": "ok"}`)
+	case "harmony":
+		u := fmt.Sprintf("%v/hubs/%v/commands/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, call)
+		data, err := request(r.Context(), http.MethodPost, u)
+		if err != nil {
+			http.Error(w, "Unable to issue command", http.StatusInternalServerError)
+			log.Printf("Error sending command: %v\n", err)
+			return
+		}
+		var status RequestResponse
+		err = json.Unmarshal(data, &status)
+		if err != nil {
+			http.Error(w, "Unable to issue command", http.StatusInternalServerError)
+			log.Printf("Error sending command: %v\n", err)
+			return
+		}
+		if status.Message != "ok" {
+			msg := fmt.Sprintf("API did not come back OK, returned: %v\n", status.Message)
+			http.Error(w, msg, http.StatusInternalServerError)
+			log.Printf(msg, status.Message)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(status)
+	default:
+		http.Error(w, "No control method configured", http.StatusInternalServerError)
+		log.Println("No control method configured")
 	}
-	var status RequestResponse
-	err = json.Unmarshal(data, &status)
-	if err != nil {
-		http.Error(w, "Unable to issue command", http.StatusInternalServerError)
-		log.Printf("Error sending command: %v\n", err)
-		return
-	}
-	if status.Message != "ok" {
-		msg := fmt.Sprintf("API did not come back OK, returned: %v\n", status.Message)
-		http.Error(w, msg, http.StatusInternalServerError)
-		log.Printf(msg, status.Message)
-		return
-	}
-	_ = json.NewEncoder(w).Encode(status)
 }
 
 func instant(w http.ResponseWriter, r *http.Request) {

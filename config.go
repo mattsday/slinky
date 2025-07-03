@@ -3,8 +3,15 @@ package main
 type Config struct {
 	Port       string     `mapstructure:"port"`
 	HarmonyApi HarmonyApi `mapstructure:"harmony_api"`
+	SkyQ       SkyQ       `mapstructure:"sky_q"`
+	Control    string     `mapstructure:"control"` // "harmony" or "skyq"
 	Dev        Dev        `mapstructure:"dev"`
 	Stream     Stream     `mapstructure:"stream"`
+}
+
+type SkyQ struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 type HarmonyApi struct {
