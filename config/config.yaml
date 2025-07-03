@@ -11,9 +11,9 @@ stream:
   quality:
     - name: Very High
       location: /stream/0.ts
-      default: true
     - name: High
       location: /stream/1.ts
+      default: true
     - name: Medium
       location: /stream/2.ts
     - name: Low
