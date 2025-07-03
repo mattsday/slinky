@@ -18,7 +18,6 @@ stream:
       default: true
     - name: High (h.264)
       location: /stream/1.ts
-      default: true
     - name: Medium (hevc)
       location: /stream/2.ts
     - name: Low (hevc)
