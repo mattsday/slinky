@@ -1,10 +1,10 @@
 # Slinky
 
-I used to love my Slingbox back in the day. They killed it over and over (ads, web client, ...), and finally killed it
-for good by shutting down the servers.
+A homemade alternative to a Slingbox.
 
-I've long wanted to build my own replacement and this is kind of step #1. It's very much a passion-project and something
-I plan on working on over the coming years - exclusively for my own needs!
+I used to love my Slingbox back in the day. They killed it over and over (ads, web client, ...), and finally killed it for good by shutting down the servers.
+
+I've long wanted to build my own replacement and this is kind of step #1. It's very much a passion-project and something I plan on working on over the coming years - exclusively for my own needs!
 
 ## Dependencies
 
@@ -20,18 +20,15 @@ Assuming you have the dependencies working, you can deploy slinky using `samples
 
 There are some configuration paramters you can change via `config/config.yaml` or environment variables (see below).
 
-Once running you can go to `/video` for a live video view, or just the default page on `/` for a remote control.
+Once running you can go to `/` for a live video view, or `/remote` for a remote control.
 
 ### Harmony API
 
-The Harmony API does most of Slinky's work - you can find an example docker-compose file
-in `samples/harmony-api/docker-compose.yaml`
+The Harmony API does most of Slinky's work - you can find an example docker-compose file in `samples/harmony-api/docker-compose.yaml`
 
 ### Reverse Proxy
 
-To make this work on the internet I strongly recommend using a reverse proxy and some kind of
-SSO. `samples/nginx/slinky.example.conf` is a basic implementation. For my own personal use, I combine this
-with [Nginx SSO by Luzifer](https://github.com/Luzifer/nginx-sso).
+To make this work on the internet I strongly recommend using a reverse proxy and some kind of SSO. `samples/nginx/slinky.example.conf` is a basic implementation. For my own personal use, I combine this with [Nginx SSO by Luzifer](https://github.com/Luzifer/nginx-sso).
 
 ## Configuration
 
@@ -62,9 +59,7 @@ Configure the built-in video stream
 
 ### Dev
 
-When developing locally CORS will stop you from directly streaming the video source into the browser. Go has some very
-simple reverse proxy features to allow this, but we don't wanna run this in production - so useful for local IDE
-development.
+When developing locally CORS will stop you from directly streaming the video source into the browser. Go has some very simple reverse proxy features to allow this, but we don't wanna run this in production - so useful for local IDE development.
 
 If you enable this, you should set `STREAM.HQ=/<x>.ts`.
 
@@ -75,4 +70,16 @@ If you enable this, you should set `STREAM.HQ=/<x>.ts`.
 
 ## Future Plans
 
-When created I was a backend developer and had no clue about UI, UX, etc. If I were to do this again, I'd rewrite it in Next.js or possibly rewrite the frontend in Flutter so I could have it as a fat client in a browser. Oh well.
+When created I was a backend developer and had no clue about UI, UX, etc. If I were to do this again, I'd rewrite it in React + Next.js and definitely not as a weird hybrid with a Go backend and handcrafted js in the frontend.
+
+Much of the code was refactored in 2025 with the help of Gemini. Still not how I'd write it from scratch but much better than it was.
+
+### Wishlist
+
+#### Sky API
+
+As I use this to directly control a Sky Q box, I think I could remove the Harmony dependency and instead migrate to the Sky API ([python](https://github.com/bradwood/pyskyq) and [nodejs](https://github.com/dalhundal/sky-remote)) or have that as an alternative option. It might be more reliable / robust too.
+
+#### HLS
+
+I would love this to auto-select quality and be more seamless, but it simply adds too much latency. I don't know if changes in the future will improve this. Something to keep an eye on.
