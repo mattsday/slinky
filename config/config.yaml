@@ -13,14 +13,15 @@ harmony_api:
   default_activity: watch-tv
 stream:
   quality:
-    - name: Very High
+    - name: High (hevc)
       location: /stream/0.ts
-    - name: High
+      default: true
+    - name: High (h.264)
       location: /stream/1.ts
       default: true
-    - name: Medium
+    - name: Medium (hevc)
       location: /stream/2.ts
-    - name: Low
+    - name: Low (hevc)
       location: /stream/3.ts
 dev:
   enabled: false
