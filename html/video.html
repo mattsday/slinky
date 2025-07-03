@@ -35,9 +35,7 @@
     <div class="row">
         <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-xs-12">
             <div class="embed-responsive embed-responsive-16by9">
-                <video id="slinky-video" controls autoplay muted></video>
-                <!-- <video-js id=slinky-video class="vjs-default-skin video-js embed-responsive-item col-12" controls muted> -->
-                <!-- </video-js> -->
+                <video id="slinky-video" controls autoplay muted style="max-width: 100%"></video>
             </div>
             <select class="form-select" aria-label="Video Quality" id="quality">
                 {{range $i, $a := .Stream.Quality}}

@@ -37,28 +37,28 @@ with [Nginx SSO by Luzifer](https://github.com/Luzifer/nginx-sso).
 
 ### Basic Config
 
-| Config | Environment Variable | Description                        | Example   |
-|--------|----------------------|------------------------------------|-----------|
-| `port` | `PORT`               | Port for this service to listen on | PORT=8080 |
+| Config | Environment Variable | Description                        | Example     |
+| ------ | -------------------- | ---------------------------------- | ----------- |
+| `port` | `PORT`               | Port for this service to listen on | `PORT=8080` |
 
-### Harmony API
+### Configure Harmony API
 
 Configure the [Harmony API](https://github.com/maddox/harmony-api) and how it should connect.
 
-| Config                         | Environment Variable           | Description                                                 | Example                               |
-|--------------------------------|--------------------------------|-------------------------------------------------------------|---------------------------------------|
-| `harmony_api.url`              | `HARMONY_API.URL`              | Where the Harmony API is running                            | HARMONY_API.URL=http://localhost:8282 |
-| `harmony_api.default_hub`      | `HARMONY_API.DEFAULT_HUB`      | The hub to connect to (future versions may allow more flex) | HARMONY_API.DEFAULT_HUB=living-room   |
-| `harmony_api.default_activity` | `HARMONY_API.DEFAULT_ACTIVITY` | The activity to use (future versions may allow more flex)   | HARMONY_API.DEFAULT_ACTIVITY=watch-tv |
+| Config                         | Environment Variable           | Description                                                 | Example                                 |
+| ------------------------------ | ------------------------------ | ----------------------------------------------------------- | --------------------------------------- |
+| `harmony_api.url`              | `HARMONY_API.URL`              | Where the Harmony API is running                            | `HARMONY_API.URL=http://localhost:8282` |
+| `harmony_api.default_hub`      | `HARMONY_API.DEFAULT_HUB`      | The hub to connect to (future versions may allow more flex) | `HARMONY_API.DEFAULT_HUB=living-room`   |
+| `harmony_api.default_activity` | `HARMONY_API.DEFAULT_ACTIVITY` | The activity to use (future versions may allow more flex)   | `HARMONY_API.DEFAULT_ACTIVITY=watch-tv` |
 
 ### Streaming
 
 Configure the built-in video stream
 
 | Config        | Environment Variable | Description                                                                                       | Example             |
-|---------------|----------------------|---------------------------------------------------------------------------------------------------|---------------------|
-| `stream.hq`   | `STREAM.HQ`          | The default HQ stream URL to use                                                                  | STREAM.HQ=/0.m3u8   |
-| `stream.fast` | `STREAM.FAST`        | Unused today, but future versions may switch to the fast stream when using the remote for example | STREAM.FAST=/1.m3u8 |
+| ------------- | -------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
+| `stream.hq`   | `STREAM.HQ`          | The default HQ stream URL to use                                                                  | `STREAM.HQ=/0.ts`   |
+| `stream.fast` | `STREAM.FAST`        | Unused today, but future versions may switch to the fast stream when using the remote for example | `STREAM.FAST=/1.ts` |
 
 ### Dev
 
@@ -66,17 +66,13 @@ When developing locally CORS will stop you from directly streaming the video sou
 simple reverse proxy features to allow this, but we don't wanna run this in production - so useful for local IDE
 development.
 
-If you enable this, you should set `STREAM.HQ=/<x>.m3u8`.
+If you enable this, you should set `STREAM.HQ=/<x>.ts`.
 
-| Config        | Environment Variable | Description                                       | Example                          |
-|---------------|----------------------|---------------------------------------------------|----------------------------------|
-| `dev.enabled` | `DEV.ENABLED `       | Whether to enable Dev mode (reverse proxy) or not | DEV.ENABLED=true                 |
-| `dev.stream`  | `DEV.STREAM`         | Your stream URL to proxy                          | DEV.STREAM=http://192.168.1.168/ |
+| Config        | Environment Variable | Description                                       | Example                            |
+| ------------- | -------------------- | ------------------------------------------------- | ---------------------------------- |
+| `dev.enabled` | `DEV.ENABLED`        | Whether to enable Dev mode (reverse proxy) or not | `DEV.ENABLED=true`                 |
+| `dev.stream`  | `DEV.STREAM`         | Your stream URL to proxy                          | `DEV.STREAM=http://192.168.1.168/` |
 
 ## Future Plans
 
-This was very much knocked together quickly and I am _not_ a developer. I really don't know what I'm doing, especially
-with frontend code.
-
-Likely a version 2 frontend (if it ever happens) will be built in [Flutter](https://flutter.dev) for a nicer UI, native
-clients, and probably better performance for H.264/H.265 across devices.
+When created I was a backend developer and had no clue about UI, UX, etc. If I were to do this again, I'd rewrite it in Next.js or possibly rewrite the frontend in Flutter so I could have it as a fat client in a browser. Oh well.

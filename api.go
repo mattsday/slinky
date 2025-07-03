@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -68,10 +67,10 @@ func request(ctx context.Context, method string, u string) (response []byte, err
 		return response, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return response, errors.New(fmt.Sprintf("upstream status code %d (request URI: %v)", resp.StatusCode, u))
+		return response, fmt.Errorf("upstream status code %d (request URI: %v)", resp.StatusCode, u)
 	}
-	response, err = ioutil.ReadAll(resp.Body)
-	return response, nil
+	response, err = io.ReadAll(resp.Body)
+	return response, err
 }
 
 type PowerStatus struct {

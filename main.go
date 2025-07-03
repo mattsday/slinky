@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
 	"html/template"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 )
 
 var cfg Config
@@ -169,7 +170,6 @@ func instant(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/vnd.apple.mpegurl")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("#EXTM3U\n#EXTINF:0,\n3.ts\n"))
-	return
 }
 
 // NewProxy takes target host and creates a reverse proxy
