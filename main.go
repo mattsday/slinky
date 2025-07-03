@@ -48,6 +48,8 @@ func main() {
 		return
 	}
 
+	log.Printf("Using control mode: %v\n", cfg.Control)
+
 	mux := http.NewServeMux()
 
 	// 1. Wrap the static file handler in a method to resolve the conflict.
