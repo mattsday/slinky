@@ -49,37 +49,46 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Static file server
+	// 1. Wrap the static file handler in a method to resolve the conflict.
 	staticServer := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
-	mux.Handle("/html/static/", staticServer)
+	mux.HandleFunc("GET /html/static/", staticServer.ServeHTTP)
 
 	// Page handlers
-	mux.HandleFunc("GET /", home)
 	mux.HandleFunc("GET /video", video)
 	mux.HandleFunc("GET /remote", remote)
 	mux.HandleFunc("GET /instant.m3u8", instant)
 
-	// API handlers with middleware
+	// API handlers
 	mux.HandleFunc("GET /api/v1/pwr", apiHandler(pwStatus))
 	mux.HandleFunc("GET /api/v1/call/power", apiHandler(togglePower))
 	mux.HandleFunc("GET /api/v1/call/{call}", apiHandler(apiCall))
 
+	// Dev mode proxy
 	if cfg.Dev.Enabled {
 		log.Println("Warning: Dev mode enabled")
 		proxy, err := NewProxy()
 		if err != nil {
 			panic(err)
 		}
-		// Handle proxy requests for dev mode
+		// This handler will catch all requests not already matched and check if they should be proxied.
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			// Check if the path matches the files to be proxied
-			if strings.HasSuffix(r.URL.Path, ".m3u8") || strings.HasSuffix(r.URL.Path, ".ts") || strings.HasSuffix(r.URL.Path, ".flv") {
+			path := r.URL.Path
+			// Check if it's a file to proxy
+			if strings.HasSuffix(path, ".m3u8") || strings.HasSuffix(path, ".ts") || strings.HasSuffix(path, ".flv") {
 				ProxyRequestHandler(proxy)(w, r)
 				return
 			}
-			// If not a proxy request, it might be another route, but for this setup we assume it's a 404
+			// If not a proxy request, it must be the home page (for GET /).
+			if path == "/" && r.Method == http.MethodGet {
+				home(w, r)
+				return
+			}
+			// Otherwise, it's a 404
 			http.NotFound(w, r)
 		})
+	} else {
+		// If not in dev mode, just handle the root.
+		mux.HandleFunc("GET /", home)
 	}
 
 	log.Printf("Startup Complete, listening on port %v\n", cfg.Port)
@@ -131,7 +140,6 @@ func pwStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func togglePower(w http.ResponseWriter, r *http.Request) {
-	// Get current status
 	status, err := powerStatus(r.Context())
 	if err != nil {
 		http.Error(w, "Unable to get status", http.StatusInternalServerError)
@@ -158,7 +166,7 @@ func togglePower(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCall(w http.ResponseWriter, r *http.Request) {
-	call := r.PathValue("call") // Get the wildcard value
+	call := r.PathValue("call")
 	if call == "" {
 		http.Error(w, "Unable to get API call", http.StatusBadRequest)
 		log.Printf("No API call found\n")
@@ -193,26 +201,15 @@ func instant(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("#EXTM3U\n#EXTINF:0,\n3.ts\n"))
 }
 
-// NewProxy takes target host and creates a reverse proxy
 func NewProxy() (*httputil.ReverseProxy, error) {
-	url, err := url.Parse(fmt.Sprintf("%v", cfg.Dev.Stream))
+	targetUrl, err := url.Parse(cfg.Dev.Stream)
 	if err != nil {
 		return nil, err
 	}
-
-	log.Printf("Dev Url: %v\n", url)
-
-	proxy := httputil.NewSingleHostReverseProxy(url)
-
-	originalDirector := proxy.Director
-	proxy.Director = func(req *http.Request) {
-		originalDirector(req)
-	}
-
-	return proxy, nil
+	log.Printf("Dev proxy enabled for URL: %v\n", targetUrl)
+	return httputil.NewSingleHostReverseProxy(targetUrl), nil
 }
 
-// ProxyRequestHandler handles the http request using proxy
 func ProxyRequestHandler(proxy *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
