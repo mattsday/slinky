@@ -59,6 +59,8 @@ func sendSkyCommand(host string, port int, command string) error {
 		return fmt.Errorf("unknown sky command: %s", command)
 	}
 
+	fmt.Printf("Sending Sky Q Command to %v:%v -- %v\n", host, port, command)
+
 	// 1. Establish a TCP connection with a timeout.
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", host, port), 2*time.Second)
 	if err != nil {
