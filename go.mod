@@ -1,13 +1,10 @@
 module slinky
 
-go 1.21.0
+go 1.22.0
 
 toolchain go1.24.4
 
-require (
-	github.com/gorilla/mux v1.8.1
-	github.com/spf13/viper v1.20.1
-)
+require github.com/spf13/viper v1.20.1
 
 require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect

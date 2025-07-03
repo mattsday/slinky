@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
 
@@ -46,40 +46,51 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 		return
 	}
-	r := mux.NewRouter()
-	s := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
-	r.HandleFunc("/", home).Methods(http.MethodGet)
-	r.HandleFunc("/video", video).Methods(http.MethodGet)
-	r.HandleFunc("/remote", remote).Methods(http.MethodGet)
-	r.HandleFunc("/instant.m3u8", instant).Methods(http.MethodGet)
-	r.PathPrefix("/html/static/").Handler(s)
-	api := r.PathPrefix("/api").Subrouter()
-	api.Use(apiHandler)
-	api.HandleFunc("/v1/pwr", pwStatus).Methods(http.MethodGet)
-	api.HandleFunc("/v1/call/power", togglePower).Methods(http.MethodGet)
-	api.HandleFunc("/v1/call/{call}", apiCall).Methods(http.MethodGet)
+
+	mux := http.NewServeMux()
+
+	// Static file server
+	staticServer := http.StripPrefix("/html/static/", http.FileServer(http.Dir("./html/static/")))
+	mux.Handle("/html/static/", staticServer)
+
+	// Page handlers
+	mux.HandleFunc("GET /", home)
+	mux.HandleFunc("GET /video", video)
+	mux.HandleFunc("GET /remote", remote)
+	mux.HandleFunc("GET /instant.m3u8", instant)
+
+	// API handlers with middleware
+	mux.HandleFunc("GET /api/v1/pwr", apiHandler(pwStatus))
+	mux.HandleFunc("GET /api/v1/call/power", apiHandler(togglePower))
+	mux.HandleFunc("GET /api/v1/call/{call}", apiHandler(apiCall))
 
 	if cfg.Dev.Enabled {
 		log.Println("Warning: Dev mode enabled")
-		proxy, err := NewProxy("/0.mF3u8")
+		proxy, err := NewProxy()
 		if err != nil {
 			panic(err)
 		}
-		dev := r.PathPrefix("/").Subrouter()
-		dev.HandleFunc("/{.*\\.m3u8}", ProxyRequestHandler(proxy))
-		dev.HandleFunc("/{.*\\.ts}", ProxyRequestHandler(proxy))
-		dev.HandleFunc("/{.*\\.flv}", ProxyRequestHandler(proxy))
+		// Handle proxy requests for dev mode
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			// Check if the path matches the files to be proxied
+			if strings.HasSuffix(r.URL.Path, ".m3u8") || strings.HasSuffix(r.URL.Path, ".ts") || strings.HasSuffix(r.URL.Path, ".flv") {
+				ProxyRequestHandler(proxy)(w, r)
+				return
+			}
+			// If not a proxy request, it might be another route, but for this setup we assume it's a 404
+			http.NotFound(w, r)
+		})
 	}
 
 	log.Printf("Startup Complete, listening on port %v\n", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, mux))
 }
 
-func apiHandler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func apiHandler(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -147,13 +158,13 @@ func togglePower(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCall(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	if vars["call"] == "" {
+	call := r.PathValue("call") // Get the wildcard value
+	if call == "" {
 		http.Error(w, "Unable to get API call", http.StatusBadRequest)
 		log.Printf("No API call found\n")
 		return
 	}
-	u := fmt.Sprintf("%v/hubs/%v/commands/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, vars["call"])
+	u := fmt.Sprintf("%v/hubs/%v/commands/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, call)
 	data, err := request(r.Context(), http.MethodPost, u)
 	if err != nil {
 		http.Error(w, "Unable to issue command", http.StatusInternalServerError)
@@ -183,7 +194,7 @@ func instant(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewProxy takes target host and creates a reverse proxy
-func NewProxy(path string) (*httputil.ReverseProxy, error) {
+func NewProxy() (*httputil.ReverseProxy, error) {
 	url, err := url.Parse(fmt.Sprintf("%v", cfg.Dev.Stream))
 	if err != nil {
 		return nil, err
