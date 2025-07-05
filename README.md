@@ -2,9 +2,11 @@
 
 A homemade alternative to a Slingbox.
 
+![Screenshot of the Slinky web UI](images/slinky.webp)
+
 I used to love my Slingbox back in the day. They killed it over and over (ads, web client, ...), and finally killed it for good by shutting down the servers.
 
-I've long wanted to build my own replacement and this is kind of step #1. It's very much a passion-project and something I plan on working on over the coming years - exclusively for my own needs!
+I've long wanted to build my own replacement and this is kind of step #1. It's very much a passion-project and something I use quite a bit when traveling.
 
 ## Dependencies
 
@@ -15,7 +17,7 @@ You will require a means to create the stream and a web server:
 
 You will also need a way to control your external device - currently Slinky supports controlling [Sky TV boxes](https://www.sky.com/tv/sky-q) (a UK TV service provider) directly or sending commands via a [Logitch Harmony Hub](https://www.logitech.com/en-gb/products.html).
 
-### Additional Logitech Harmony Requirements
+### Additional Logitech Harmony requirements
 
 **Note:** You only require this if you do not plan to stream from a Sky Q TV box
 
@@ -31,13 +33,13 @@ There are some configuration paramters you can change via `config/config.yaml` o
 
 Once running you can go to `/` for a live video view, or `/remote` for a remote control.
 
-### Reverse Proxy
+### Reverse proxy
 
 To make this work on the internet I strongly recommend using a reverse proxy and some kind of SSO. `samples/nginx/slinky.example.conf` is a basic implementation. For my own personal use, I combine this with [Nginx SSO by Luzifer](https://github.com/Luzifer/nginx-sso).
 
 ## Configuration
 
-### Basic Config
+### Basic config
 
 | Config    | Environment Variable | Description                                                                | Example        |
 | --------- | -------------------- | -------------------------------------------------------------------------- | -------------- |
@@ -85,13 +87,21 @@ If you enable this, you should set `STREAM.HQ=/<x>.ts`.
 | `dev.enabled` | `DEV.ENABLED`        | Whether to enable Dev mode (reverse proxy) or not | `DEV.ENABLED=true`                 |
 | `dev.stream`  | `DEV.STREAM`         | Your stream URL to proxy                          | `DEV.STREAM=http://192.168.1.168/` |
 
-## Future Plans
+## Future plans
 
 When created I was a backend developer and had no clue about UI, UX, etc. If I were to do this again, I'd rewrite it in React + Next.js and definitely not as a weird hybrid with a Go backend and handcrafted js in the frontend.
 
 Much of the code was refactored in 2025 with the help of Gemini. Still not how I'd write it from scratch but much better than it was.
 
 ### Wishlist
+
+#### More beautiful UI
+
+It's using Bootstrap today and even then barely. It works - you stick the video in fullscreen and move on. Doesn't mean it can't be more beautiful though.
+
+#### Popup remote in fullscreen
+
+I had a go at getting AI to do this once. Didn't work. Will try again one day. It would be very cool to have the remote show in fullscreen and the video controls actually control your remote device.
 
 #### All-in-one distribution
 
@@ -101,6 +111,6 @@ Something like a Docker image for a Raspberry Pi would be pretty cool for minima
 
 I would love this to auto-select quality and be more seamless, but it simply adds too much latency. I don't know if changes in the future will improve this. Something to keep an eye on.
 
-#### More Remote Options
+#### More remote options
 
 Would be cool to integrate into something even simpler for remote config
