@@ -99,10 +99,6 @@ Much of the code was refactored in 2025 with the help of Gemini. Still not how I
 
 It's using Bootstrap today and even then barely. It works - you stick the video in fullscreen and move on. Doesn't mean it can't be more beautiful though.
 
-#### Popup remote in fullscreen
-
-I had a go at getting AI to do this once. Didn't work. Will try again one day. It would be very cool to have the remote show in fullscreen and the video controls actually control your remote device.
-
 #### All-in-one distribution
 
 Something like a Docker image for a Raspberry Pi would be pretty cool for minimal setup and configuration which would include nginx and so on out of the box.
