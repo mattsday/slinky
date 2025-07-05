@@ -1,5 +1,4 @@
 #remote {
-  /*background: #e5e5e5;*/
   border-radius: 30px;
 }
 
@@ -21,4 +20,98 @@
 }
 .icon-blue {
   color: blue;
+}
+
+#video-wrapper {
+    position: relative;
+}
+
+.video-layout {
+    display: flex;
+}
+
+.video-layout #video-container {
+    flex-grow: 1;
+}
+
+.video-layout #remote-panel {
+    width: 350px;
+    margin-left: 1rem;
+}
+
+#video-wrapper.fullscreen-active {
+    display: flex;
+    background-color: black;
+}
+
+#video-wrapper.fullscreen-active.cursor-hidden {
+    cursor: none;
+}
+
+/* Also hide the cursor on the button itself */
+#video-wrapper.fullscreen-active.cursor-hidden .fullscreen-button {
+    cursor: none;
+}
+
+#video-wrapper.fullscreen-active #video-container {
+    flex-grow: 1;
+}
+
+#video-wrapper.fullscreen-active #remote-panel {
+    width: 350px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    padding: 1rem;
+}
+
+.remote-hidden {
+    display: none;
+}
+
+#video-container {
+    position: relative;
+}
+
+.fullscreen-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1001;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.fullscreen-button.visible {
+    opacity: 1;
+}
+
+@media (min-width: 992px) { /* Large screens and up */
+    #video-wrapper.fullscreen-active #remote-panel {
+        width: 350px;
+        overflow-y: auto;
+        background-color: #000; /* Black background */
+        color: #fff; /* White text */
+        padding: 1rem;
+    }
+
+    /* Adjust button colors for dark background */
+    #video-wrapper.fullscreen-active #remote-panel .btn-outline-secondary {
+        color: #fff;
+        border-color: #6c757d;
+    }
+
+    #video-wrapper.fullscreen-active #remote-panel .btn-outline-secondary:hover {
+        background-color: #6c757d;
+    }
+
+    /* Adjust channel input for dark background */
+    #video-wrapper.fullscreen-active #remote-panel .form-control {
+        background-color: #343a40;
+        color: #fff;
+        border-color: #6c757d;
+    }
 }

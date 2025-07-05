@@ -9,6 +9,11 @@ import (
 )
 
 func powerStatus(ctx context.Context) (ps PowerStatus, err error) {
+	// Ignore for non-harmony
+	if cfg.Control != "harmony" {
+		ps.Off = false
+		return ps, err
+	}
 	var status Status
 	// Construct URL from options
 	u := fmt.Sprintf("%v/hubs/%v/status", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub)
@@ -28,6 +33,10 @@ func powerStatus(ctx context.Context) (ps PowerStatus, err error) {
 }
 
 func turnOn(ctx context.Context) (ps PowerStatus, err error) {
+	if cfg.Control != "harmony" {
+		ps.Off = false
+		return ps, err
+	}
 	u := fmt.Sprintf("%v/hubs/%v/activities/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, cfg.HarmonyApi.DefaultActivity)
 	data, err := request(ctx, http.MethodPost, u)
 	if err != nil {
@@ -42,6 +51,10 @@ func turnOn(ctx context.Context) (ps PowerStatus, err error) {
 }
 
 func turnOff(ctx context.Context) (ps PowerStatus, err error) {
+	if cfg.Control != "harmony" {
+		ps.Off = false
+		return ps, err
+	}
 	u := fmt.Sprintf("%v/hubs/%v/off", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub)
 	data, err := request(ctx, http.MethodPut, u)
 	if err != nil {

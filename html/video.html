@@ -22,29 +22,28 @@
   <body>
     <h1>Slinky</h1>
     <div class="container">
-      <div class="row">
-        <div class="col-xxl-10 col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12">
-          <div class="ratio ratio-16x9">
-            <video
-              id="slinky-video"
-              controls
-              autoplay
-              muted
-              class="ratio-item"
-              x-webkit-airplay="allow"
-            ></video>
-            <button id="castButton" style="display: none">Cast Video</button>
-          </div>
-          <select class="form-select" aria-label="Video Quality" id="quality">
-            {{range $i, $a := .Stream.Quality}}
-            <option value="{{$a.Location}}" {{if $a.Default}} selected {{end}}>
-              Quality: {{$a.Name}}
-            </option>
-            {{end}}
-          </select>
+      <div id="video-wrapper" class="video-layout">
+        <div id="video-container" class="ratio ratio-16x9">
+          <video
+            id="slinky-video"
+            autoplay
+            muted
+            class="ratio-item"
+            x-webkit-airplay="allow"
+          ></video>
+          <button id="fullscreen-button" class="fullscreen-button">
+            <i class="fas fa-expand"></i>
+          </button>
         </div>
-        {{template "remote.html" .}}
+        <div id="remote-panel">{{template "remote.html" .}}</div>
       </div>
+      <select class="form-select" aria-label="Video Quality" id="quality">
+        {{range $i, $a := .Stream.Quality}}
+        <option value="{{$a.Location}}" {{if $a.Default}} selected {{end}}>
+          Quality: {{$a.Name}}
+        </option>
+        {{end}}
+      </select>
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
