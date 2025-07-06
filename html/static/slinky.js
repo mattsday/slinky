@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let buttonId;
+        // Handle number keys (0-9)
+        if (event.code.startsWith('Digit') || event.code.startsWith('Numpad')) {
+            buttonId = event.code.slice(-1);
+        }
+
         switch (event.code) {
             case 'Space':
                 event.preventDefault();
