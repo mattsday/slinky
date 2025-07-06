@@ -1,2 +1,4 @@
 .idea/
 dump.rdb
+config/config-local.yaml
+*.ts

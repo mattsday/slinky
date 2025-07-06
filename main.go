@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -30,6 +31,18 @@ func loadCfg() (err error) {
 	if cfg.Dev.Enabled {
 		viper.SetConfigName("config-dev")
 		viper.AddConfigPath("config")
+		if err = viper.MergeInConfig(); err != nil {
+			log.Printf("Warning: %v\n", err)
+		}
+		if err := viper.Unmarshal(&cfg); err != nil {
+			log.Printf("Error loading config: %v", err)
+			return err
+		}
+	}
+	// Read a config file from environment if present
+	if os.Getenv("CONFIG_FILE") != "" {
+		log.Printf("Adding config file %v\n", os.Getenv("CONFIG_FILE"))
+		viper.SetConfigFile(os.Getenv("CONFIG_FILE"))
 		if err = viper.MergeInConfig(); err != nil {
 			log.Printf("Warning: %v\n", err)
 		}
