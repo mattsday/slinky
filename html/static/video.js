@@ -46,12 +46,22 @@ export function initVideoPlayer() {
 
   if (fullscreenButton && videoWrapper) {
     fullscreenButton.addEventListener('click', () => {
-      if (videoWrapper.requestFullscreen) {
-        videoWrapper.requestFullscreen();
-      } else if (videoWrapper.webkitRequestFullscreen) {
-        videoWrapper.webkitRequestFullscreen();
-      } else if (videoWrapper.msRequestFullscreen) {
-        videoWrapper.msRequestFullscreen();
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (videoWrapper.requestFullscreen) {
+          videoWrapper.requestFullscreen();
+        } else if (videoWrapper.webkitRequestFullscreen) { /* Safari */
+          videoWrapper.webkitRequestFullscreen();
+        } else if (videoWrapper.msRequestFullscreen) { /* IE11 */
+          videoWrapper.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari */
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE11 */
+          document.msExitFullscreen();
+        }
       }
     });
   }
@@ -84,6 +94,7 @@ export function initVideoPlayer() {
   }
 
   function handleFullscreenChange() {
+    const icon = fullscreenButton.querySelector('i');
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       videoWrapper.classList.add('fullscreen-active');
       videoWrapper.classList.remove('video-layout');
@@ -92,6 +103,8 @@ export function initVideoPlayer() {
       videoContainer.removeEventListener('mouseleave', hideMainFullscreenButton);
       videoWrapper.addEventListener('mousemove', handleFullscreenActivity);
       videoWrapper.addEventListener('touchstart', handleFullscreenActivity);
+      icon.classList.remove('fa-expand');
+      icon.classList.add('fa-compress');
     } else {
       videoWrapper.classList.remove('fullscreen-active');
       videoWrapper.classList.add('video-layout');
@@ -105,6 +118,8 @@ export function initVideoPlayer() {
       fullscreenButton.classList.remove('visible');
       videoWrapper.classList.remove('cursor-hidden');
       clearTimeout(hideTimeout);
+      icon.classList.remove('fa-compress');
+      icon.classList.add('fa-expand');
     }
   }
 
@@ -124,8 +139,10 @@ export function initCasting() {
       castButton.style.display = 'none';
     });
 
-    video.remote.prompt().catch((error) => {
-      console.error('Error opening remote playback prompt:', error);
+    castButton.addEventListener('click', () => {
+      video.remote.prompt().catch((error) => {
+        console.error('Error opening remote playback prompt:', error);
+      });
     });
   }
 }

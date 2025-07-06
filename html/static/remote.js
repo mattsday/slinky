@@ -53,6 +53,12 @@ export function initRemoteControls() {
 
     const buttonId = button.id;
 
+    // Add visual feedback to the clicked button
+    button.classList.add('btn-clicked');
+    setTimeout(() => {
+      button.classList.remove('btn-clicked');
+    }, 200); // Remove the class after 200ms
+
     // If the video element exists and a volume/mute button is clicked
     if (videoElement && ['volume-up', 'volume-down', 'mute'].includes(buttonId)) {
       switch (buttonId) {
