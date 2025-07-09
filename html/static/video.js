@@ -5,6 +5,8 @@ export function initVideoPlayer() {
   const videoContainer = document.getElementById('video-container');
   const remotePanel = document.getElementById('remote-panel');
   const fullscreenButton = document.getElementById('fullscreen-button');
+  const qualityDisplay = document.getElementById('quality-display');
+
   let hideTimeout;
   let hlsPlayer;
   let mpegtsPlayer;
@@ -20,7 +22,7 @@ export function initVideoPlayer() {
     }
   };
 
-  const changeStream = (url) => {
+  const changeStream = (url, name = "") => {
     destroyPlayers();
 
     if (url === 'hls') {
@@ -30,6 +32,12 @@ export function initVideoPlayer() {
         hlsPlayer.attachMedia(videoElement);
         hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
           videoElement.play();
+        });
+        hlsPlayer.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+          const level = hlsPlayer.levels[data.level];
+          if (level && level.name) {
+            qualityDisplay.textContent = `Auto quality: ${level.name}`;
+          }
         });
       } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
         videoElement.src = '/playlist.m3u8';
@@ -44,6 +52,7 @@ export function initVideoPlayer() {
           isLive: true,
           url: url
         });
+        qualityDisplay.textContent = `${name}`;
         mpegtsPlayer.attachMediaElement(videoElement);
         mpegtsPlayer.load();
         mpegtsPlayer.play();
@@ -61,11 +70,12 @@ export function initVideoPlayer() {
     sourceDropdown.addEventListener('change', (event) => {
       const selectedValue = event.target.value;
       localStorage.setItem('selectedQuality', selectedValue);
-      changeStream(selectedValue);
+      const name = event.target.options[event.target.selectedIndex].text;
+      changeStream(selectedValue, name);
     });
-
+    const name = sourceDropdown.options[sourceDropdown.selectedIndex].text;
     // Initialize with the current value of the dropdown
-    changeStream(sourceDropdown.value);
+    changeStream(sourceDropdown.value, name);
   }
 
   videoElement.addEventListener('click', () => {
@@ -100,9 +110,11 @@ export function initVideoPlayer() {
 
   function showMainFullscreenButton() {
     fullscreenButton.classList.add('visible');
+    qualityDisplay.classList.add('visible');
   }
   function hideMainFullscreenButton() {
     fullscreenButton.classList.remove('visible');
+    qualityDisplay.classList.remove('visible');
   }
 
   videoContainer.addEventListener('mouseenter', showMainFullscreenButton);
@@ -114,6 +126,7 @@ export function initVideoPlayer() {
     fullscreenButton.classList.add('visible');
     remotePanel.classList.remove('remote-hidden');
     videoWrapper.classList.remove('cursor-hidden');
+    qualityDisplay.classList.add('visible');
 
     // Reset hide timer
     clearTimeout(hideTimeout);
@@ -122,6 +135,7 @@ export function initVideoPlayer() {
       fullscreenButton.classList.remove('visible');
       remotePanel.classList.add('remote-hidden');
       videoWrapper.classList.add('cursor-hidden');
+      qualityDisplay.classList.remove('visible');
     }, 3000); // Hide everything after 3 seconds
   }
 

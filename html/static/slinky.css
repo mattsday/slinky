@@ -116,3 +116,26 @@
     border-color: #6c757d;
   }
 }
+
+#quality-display {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 400px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 1001;
+  opacity: 0;
+  transition: opacity 0.3s;
+  /* Force this element onto its own rendering layer to ensure it's on top of the video */
+  transform: translateZ(0);
+  /* Make sure the overlay itself doesn't block clicks to the video */
+  pointer-events: none;
+}
+
+#quality-display.visible {
+  opacity: 1;
+}
