@@ -38,6 +38,7 @@
         <div id="remote-panel">{{template "remote.html" .}}</div>
       </div>
       <select class="form-select" aria-label="Video Quality" id="quality">
+        <option value="hls">Auto (higher latency)</option>
         {{range $i, $a := .Stream.Quality}}
         <option value="{{$a.Location}}" {{if $a.Default}} selected {{end}}>
           Quality: {{$a.Name}}
@@ -51,6 +52,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/mpegts.js/dist/mpegts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script type="module" src="/html/static/slinky.js"></script>
   </body>
 </html>

@@ -1,9 +1,4 @@
 export function initVideoPlayer() {
-  if (!mpegts.isSupported()) {
-    console.error("mpegts.js is not supported in this browser.");
-    return;
-  }
-
   const videoElement = document.getElementById('slinky-video');
   const sourceDropdown = document.getElementById("quality");
   const videoWrapper = document.getElementById('video-wrapper');
@@ -11,36 +6,73 @@ export function initVideoPlayer() {
   const remotePanel = document.getElementById('remote-panel');
   const fullscreenButton = document.getElementById('fullscreen-button');
   let hideTimeout;
-  let player;
+  let hlsPlayer;
+  let mpegtsPlayer;
+
+  const destroyPlayers = () => {
+    if (hlsPlayer) {
+      hlsPlayer.destroy();
+      hlsPlayer = null;
+    }
+    if (mpegtsPlayer) {
+      mpegtsPlayer.destroy();
+      mpegtsPlayer = null;
+    }
+  };
 
   const changeStream = (url) => {
-    if (player) {
-      player.destroy();
+    destroyPlayers();
+
+    if (url === 'hls') {
+      if (Hls.isSupported()) {
+        hlsPlayer = new Hls();
+        hlsPlayer.loadSource('/playlist.m3u8');
+        hlsPlayer.attachMedia(videoElement);
+        hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+          videoElement.play();
+        });
+      } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        videoElement.src = '/playlist.m3u8';
+        videoElement.addEventListener('loadedmetadata', () => {
+          videoElement.play();
+        });
+      }
+    } else {
+      if (mpegts.isSupported()) {
+        mpegtsPlayer = mpegts.createPlayer({
+          type: 'mpegts',
+          isLive: true,
+          url: url
+        });
+        mpegtsPlayer.attachMediaElement(videoElement);
+        mpegtsPlayer.load();
+        mpegtsPlayer.play();
+      }
     }
-    player = mpegts.createPlayer({
-      type: 'mpegts',
-      isLive: true,
-      url: url
-    });
-    player.attachMediaElement(videoElement);
-    player.load();
-    player.play();
   };
 
   if (sourceDropdown) {
+    // Load last saved quality from localStorage
+    const savedQuality = localStorage.getItem('selectedQuality');
+    if (savedQuality) {
+      sourceDropdown.value = savedQuality;
+    }
+
     sourceDropdown.addEventListener('change', (event) => {
-      changeStream(event.target.value);
+      const selectedValue = event.target.value;
+      localStorage.setItem('selectedQuality', selectedValue);
+      changeStream(selectedValue);
     });
+
+    // Initialize with the current value of the dropdown
     changeStream(sourceDropdown.value);
   }
 
   videoElement.addEventListener('click', () => {
-    if (player) {
-      if (videoElement.paused) {
-        player.play();
-      } else {
-        player.pause();
-      }
+    if (videoElement.paused) {
+      videoElement.play();
+    } else {
+      videoElement.pause();
     }
   });
 

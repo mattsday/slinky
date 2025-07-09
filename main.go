@@ -73,6 +73,7 @@ func main() {
 	mux.HandleFunc("GET /video", video)
 	mux.HandleFunc("GET /remote", remote)
 	mux.HandleFunc("GET /instant.m3u8", instant)
+	mux.HandleFunc("GET /playlist.m3u8", hlsPlaylist)
 
 	// API handlers
 	mux.HandleFunc("GET /api/v1/pwr", apiHandler(pwStatus))
@@ -109,6 +110,17 @@ func main() {
 
 	log.Printf("Startup Complete, listening on port %v\n", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, mux))
+}
+
+func hlsPlaylist(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "#EXTM3U")
+	fmt.Fprintln(w, "#EXT-X-VERSION:3")
+	for _, quality := range cfg.Stream.HLS {
+		fmt.Fprintf(w, "#EXT-X-STREAM-INF:BANDWIDTH=%d,NAME=\"%s\",RESOLUTION=%s,CODECS=\"%s\",FRAME-RATE=%s\n", quality.Bandwidth, quality.Name, quality.Resolution, quality.Codecs, quality.FrameRate)
+		fmt.Fprintln(w, quality.Location)
+	}
 }
 
 func apiHandler(next http.HandlerFunc) http.HandlerFunc {

@@ -69,12 +69,64 @@ Configure the [Harmony API](https://github.com/maddox/harmony-api) and how it sh
 
 ### Streaming
 
-Configure the built-in video stream
+Slinky offers two ways to stream video: **manual quality selection** and **automatic quality selection** using HLS (HTTP Live Streaming).
 
-| Config        | Environment Variable | Description                                                                                       | Example             |
-| ------------- | -------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
-| `stream.hq`   | `STREAM.HQ`          | The default HQ stream URL to use                                                                  | `STREAM.HQ=/0.ts`   |
-| `stream.fast` | `STREAM.FAST`        | Unused today, but future versions may switch to the fast stream when using the remote for example | `STREAM.FAST=/1.ts` |
+#### Manual Quality Selection
+
+You can define a list of fixed-quality streams in your `config.yaml` file. These will appear as options in the quality dropdown menu in the Slinky web UI.
+
+**Configuration (`config.yaml`)**
+
+```yaml
+stream:
+  quality:
+    - name: High (hevc)
+      location: /stream/0.ts
+      default: true
+    - name: High (h.264)
+      location: /stream/1.ts
+    - name: Medium (hevc)
+      location: /stream/2.ts
+    - name: Low (hevc)
+      location: /stream/3.ts
+```
+
+#### Automatic Quality Selection (HLS)
+
+For a more seamless experience, you can configure HLS streaming. This allows the video player to automatically adjust the stream quality based on your network conditions, which can help reduce buffering and improve playback at the cost of higher latency.
+
+When HLS is configured, an "Auto" option will be available in the quality dropdown. Selecting this will use an adaptive playlist that includes all the defined HLS streams.
+
+**Configuration (`config.yaml`)**
+
+```yaml
+stream:
+  hls:
+    - name: "1080p"
+      location: "/stream/0.m3u8"
+      bandwidth: 8000000
+      resolution: 1920x1080
+      codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+      frame_rate: 25.000
+    - name: "720p"
+      location: "/stream/1.m3u8"
+      bandwidth: 4000000
+      resolution: 1280x720
+      codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+      frame_rate: 25.000
+    - name: "480p"
+      location: "/stream/2.m3u8"
+      bandwidth: 1500000
+      resolution: 854x480
+      codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+      frame_rate: 25.000
+    - name: "360p"
+      location: "/stream/3.m3u8"
+      bandwidth: 750000
+      resolution: 640x360
+      codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+      frame_rate: 25.000
+```
 
 ### Dev
 
@@ -102,10 +154,6 @@ It's using Bootstrap today and even then barely. It works - you stick the video 
 #### All-in-one distribution
 
 Something like a Docker image for a Raspberry Pi would be pretty cool for minimal setup and configuration which would include nginx and so on out of the box.
-
-#### HLS
-
-I would love this to auto-select quality and be more seamless, but it simply adds too much latency. I don't know if changes in the future will improve this. Something to keep an eye on.
 
 #### More remote options
 

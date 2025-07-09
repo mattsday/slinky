@@ -31,11 +31,21 @@ type Dev struct {
 }
 
 type Stream struct {
-	Quality []Quality `mapstructure:"quality"`
+	Quality []Quality   `mapstructure:"quality"`
+	HLS     []HLSStream `mapstructure:"hls"`
 }
 
 type Quality struct {
 	Name     string `mapstructure:"name"`
 	Location string `mapstructure:"location"`
 	Default  bool   `mapstructure:"default"`
+}
+
+type HLSStream struct {
+	Name       string `mapstructure:"name"`
+	Location   string `mapstructure:"location"`
+	Bandwidth  int    `mapstructure:"bandwidth"`
+	Resolution string `mapstructure:"resolution"`
+	Codecs     string `mapstructure:"codecs"`
+	FrameRate  string `mapstructure:"frame_rate"`
 }
