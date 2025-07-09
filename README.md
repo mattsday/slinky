@@ -69,9 +69,9 @@ Configure the [Harmony API](https://github.com/maddox/harmony-api) and how it sh
 
 ### Streaming
 
-Slinky offers two ways to stream video: **manual quality selection** and **automatic quality selection** using HLS (HTTP Live Streaming).
+Slinky offers two ways to stream video: **manual quality selection** and **automatic quality selection** using HLS (HTTP Live Streaming). Manual quality will be lower latency due to HLS' architecture.
 
-#### Manual Quality Selection
+#### Manual Quality Selection (lower latency)
 
 You can define a list of fixed-quality streams in your `config.yaml` file. These will appear as options in the quality dropdown menu in the Slinky web UI.
 
