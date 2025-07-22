@@ -1,0 +1,31 @@
+# Docker Compose file for the Slinky Decoder Box
+# Version 3.8 is a modern and stable choice
+version: "3.8"
+
+services:
+  slinky-decoder:
+    # Build the Docker image from the 'image' directory in the current path
+    build:
+      context: ./image
+    # Always restart the container unless it is explicitly stopped,
+    # making it resilient to reboots or crashes.
+    restart: unless-stopped
+    # Run the container as user ID 850 and group ID 850
+    # This is a good security practice to avoid running as root.
+    user: "850:850"
+    volumes:
+      # Mount the configuration file from the host into the container (read-only)
+      # This allows you to change the endpoint without rebuilding the image.
+      - /etc/slinky/config.sh:/etc/slinky/config.sh:ro
+      # Share the host's X11 display socket to allow VLC to show on the screen
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      # Grant access to the Direct Rendering Infrastructure for hardware acceleration
+      - "/dev/dri:/dev/dri"
+      # Grant access to the VideoCore graphics stack
+      - "/dev/vchiq:/dev/vchiq"
+      # Grant access to the LIRC infrared device
+      - "/dev/lirc0:/dev/lirc0"
+    environment:
+      # Tell GUI applications inside the container which display to use
+      - DISPLAY=:0
