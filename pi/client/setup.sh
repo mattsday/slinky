@@ -27,10 +27,14 @@ setup_users() {
 }
 
 setup_config() {
-  cp config.sh.example config.sh
-  sed -i 's/SLINKY_ENDPOINT/'"${SLINKY_ENDPOINT}"'/g' config.sh
+  if [ ! -f config.sh ]; then
+    cp config.sh.example config.sh
+    sed -i 's/SLINKY_ENDPOINT/'"${SLINKY_ENDPOINT}"'/g' config.sh
+  fi
   sudo mkdir -p /etc/slinky
-  sudo ln -s "${PWD}/config.sh" /etc/slinky/config.sh
+  if [ ! -f /etc/slinky/config.sh ]; then
+    sudo ln -s "${PWD}/config.sh" /etc/slinky/config.sh
+  fi
   sudo chown -R slinky:slinky /etc/slinky
 }
 
