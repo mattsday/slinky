@@ -23,10 +23,10 @@ setup_users() {
 }
 
 setup_config() {
-  cp client/config.sh.example slinky/pi/client/config.sh
-  sed -i 's/SLINKY_ENDPOINT/'"${SLINKY_ENDPOINT}"'/g' slinky/pi/client/config.sh
+  cp config.sh.example config.sh
+  sed -i 's/SLINKY_ENDPOINT/'"${SLINKY_ENDPOINT}"'/g' config.sh
   sudo mkdir -p /etc/slinky
-  sudo ln -s slinky/pi/client/config.sh /etc/slinky/config.sh
+  sudo ln -s "${PWD}/config.sh" /etc/slinky/config.sh
   sudo chown -R slinky:slinky /etc/slinky
 }
 
