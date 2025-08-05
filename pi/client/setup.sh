@@ -18,8 +18,12 @@ install_docker() {
 }
 
 setup_users() {
-  sudo groupadd --gid 850 slinky
-  sudo useradd -c "Slinky" -M -u 850 -g slinky -d /etc/slinky -s /sbin/nologin slinky
+  if ! getent group slinky >/dev/null 2>&1; then
+    sudo groupadd --gid 850 slinky
+  fi
+  if ! id -u slinky >/dev/null 2>&1; then
+    sudo useradd -c "Slinky" -M -u 850 -g slinky -d /etc/slinky -s /sbin/nologin slinky
+  fi
 }
 
 setup_config() {
@@ -52,4 +56,3 @@ main() {
 }
 
 main
-
