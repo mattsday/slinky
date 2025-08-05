@@ -1,6 +1,4 @@
 # Docker Compose file for the Slinky Decoder Box
-# Version 3.8 is a modern and stable choice
-version: "3.8"
 
 services:
   slinky-decoder:

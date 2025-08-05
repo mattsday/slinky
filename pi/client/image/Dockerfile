@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Create a dedicated group and user for the application
 # Using specific IDs as requested for consistent permissions.
-RUN groupadd --gid 850 slinky &&
+RUN groupadd --gid 850 slinky && \
   useradd --uid 850 --gid 850 --create-home slinky
 
 # Install VLC, the LIRC remote control software, and procps (for process management)
