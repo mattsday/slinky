@@ -39,11 +39,11 @@ setup_config() {
 }
 
 build_image() {
-  docker compose build
+  sudo docker compose build
 }
 
 run_image() {
-  docker compose up -d
+  sudo docker compose up -d
 }
 
 main() {
