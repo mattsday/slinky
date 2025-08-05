@@ -35,15 +35,11 @@ setup_config() {
 }
 
 build_image() {
-  cd client || exit 1
   docker compose build
-  cd .. || exit 1
 }
 
 run_image() {
-  cd client || exit 1
   docker compose up -d
-  cd .. || exit 1
 }
 
 main() {
