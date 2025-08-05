@@ -10,11 +10,11 @@ RUN groupadd --gid 850 slinky &&
   useradd --uid 850 --gid 850 --create-home slinky
 
 # Install VLC, the LIRC remote control software, and procps (for process management)
-RUN apt-get update &&
+RUN apt-get update && \
   apt-get install -y --no-install-recommends \
     vlc \
     lirc \
-    procps &&
+    procps && \
   rm -rf /var/lib/apt/lists/*
 
 # Switch to the newly created user's home directory
