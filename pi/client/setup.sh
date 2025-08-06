@@ -4,7 +4,6 @@
 # 2. You have set things up exactly like the README.md file and wish to have things setup that way too
 
 install_docker() {
-  sudo apt-get update
   sudo apt-get install -y ca-certificates curl
   sudo install -m 0755 -d /etc/apt/keyrings
   sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
@@ -15,6 +14,11 @@ install_docker() {
     sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
   sudo apt-get update
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
+
+install_prereqs() {
+  sudo apt-get update
+  sudo apt-get install -y lirc
 }
 
 setup_users() {
@@ -48,6 +52,7 @@ run_image() {
 
 main() {
   set -e
+  install_prereqs
   install_docker
   setup_users
   setup_config
