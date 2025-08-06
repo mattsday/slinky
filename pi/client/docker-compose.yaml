@@ -20,8 +20,8 @@ services:
     devices:
       # Grant access to the Direct Rendering Infrastructure for hardware acceleration
       - "/dev/dri:/dev/dri"
-      # Grant access to the VideoCore graphics stack
-      - "/dev/vchiq:/dev/vchiq"
+      # Grant access to the DMA heap for modern video memory management
+      - "/dev/dma_heap:/dev/dma_heap"
       # Grant access to the LIRC infrared device
       - "/dev/lirc0:/dev/lirc0"
     environment:
