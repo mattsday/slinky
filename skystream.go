@@ -132,13 +132,14 @@ func computeSkyStreamAuthToken(certFingerprint, pairingCode, controllerNonce, st
 //
 // "menu" maps to Home, confirmed against a real box - the physical remote's
 // menu button behaves as "go to home screen", not AccessMenu ("more").
-// "return" maps to Backspace; the protocol also has a separate Dismiss key
-// that may be a better fit - still needs a real-box check (see the open
-// questions in docs/plans/sky-stream-support.md).
+// "return" maps to Dismiss - Backspace was tried first (per the protocol
+// doc's description) but didn't behave as "back" in practice. Dismiss is
+// the only other candidate in the documented key vocabulary; not yet
+// confirmed against real hardware.
 var skyStreamKeys = map[string]string{
 	"power":  "Power",
 	"select": "Enter",
-	"return": "Backspace",
+	"return": "Dismiss",
 
 	"channel-up":   "ChannelUp",
 	"channel-down": "ChannelDown",
