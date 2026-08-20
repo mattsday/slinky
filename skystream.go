@@ -130,10 +130,11 @@ func computeSkyStreamAuthToken(certFingerprint, pairingCode, controllerNonce, st
 // <video> element and never reach a control backend, same as with skyq and
 // harmony today.
 //
-// "return" maps to Backspace and "menu" maps to AccessMenu; the protocol
-// also has separate Dismiss and Home keys that may be a better fit for
-// either button - both need a few minutes on a real box to confirm (see the
-// open questions in docs/plans/sky-stream-support.md).
+// "menu" maps to Home, confirmed against a real box - the physical remote's
+// menu button behaves as "go to home screen", not AccessMenu ("more").
+// "return" maps to Backspace; the protocol also has a separate Dismiss key
+// that may be a better fit - still needs a real-box check (see the open
+// questions in docs/plans/sky-stream-support.md).
 var skyStreamKeys = map[string]string{
 	"power":  "Power",
 	"select": "Enter",
@@ -144,7 +145,7 @@ var skyStreamKeys = map[string]string{
 
 	"info":   "Info",
 	"search": "Search",
-	"menu":   "AccessMenu",
+	"menu":   "Home",
 
 	"direction-up":    "ArrowUp",
 	"direction-down":  "ArrowDown",

@@ -82,7 +82,7 @@ backends) maps fairly cleanly onto the Sky Stream key names:
 | `channel-down`     | `ChannelDown`        | |
 | `info`             | `Info`               | |
 | `search`           | `Search`             | |
-| `menu`             | `AccessMenu` or `Home` | Sky Q aliases `menu`/`home` to one code; Sky Stream has both as distinct keys — needs a real-box check for which matches the physical remote's menu button. |
+| `menu`             | `Home`               | **Confirmed on real hardware**: the remote's menu button behaves as "go to home screen", not the app's "more" menu (`AccessMenu`). |
 | `direction-up/down/left/right` | `ArrowUp`/`ArrowDown`/`ArrowLeft`/`ArrowRight` | |
 | `red`/`green`/`yellow`/`blue`  | `Red`/`Green`/`Yellow`/`Blue` | |
 | `0`–`9`             | `Digit0`–`Digit9`    | |
@@ -207,11 +207,9 @@ reachability to individual hosts.
   (`sendSkyStreamCommand` in skystream_transport.go caches the session and
   reconnects once on failure) — startup always succeeds even if the box is
   unreachable at boot.
-- `return` → `Backspace` vs. `Dismiss`, and `menu` → `AccessMenu` vs.
-  `Home` — still open. Real-hardware verification so far has only
-  exercised `Info` (confirmed working); these two need a few minutes on a
-  real box to pick the one that actually matches user expectations, not
-  just the closest-sounding name.
+- **Resolved**: `menu` → `Home`, confirmed on real hardware (matches the
+  physical remote's menu button behavior).
+- `return` → `Backspace` vs. `Dismiss` — still open.
 - Does this replace `skyq` entirely once Sky rolls out Sky Stream broadly,
   or do both stay supported side by side (i.e. is `skyq.go` here to stay)?
   Affects whether `apiCall`'s growing `switch` is a sign to do the "C"

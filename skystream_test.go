@@ -225,6 +225,15 @@ func TestSkyStreamKeys_AllRemoteButtonsMapped(t *testing.T) {
 	}
 }
 
+func TestSkyStreamKeys_MenuIsHome(t *testing.T) {
+	// Confirmed against a real box: the remote's menu button behaves as
+	// "go to home screen" (Home), not the app's "more" menu (AccessMenu).
+	// Regression guard - see docs/plans/sky-stream-support.md.
+	if got := skyStreamKeys["menu"]; got != "Home" {
+		t.Errorf(`skyStreamKeys["menu"] = %q, want "Home" (confirmed on real hardware)`, got)
+	}
+}
+
 func TestSkyStreamKeys_ValuesAreNonEmptyAndUnique(t *testing.T) {
 	seen := make(map[string]string) // key name -> button id
 	for buttonID, key := range skyStreamKeys {
