@@ -17,41 +17,65 @@ import (
 var cfg Config
 
 func loadCfg() (err error) {
-	viper.SetConfigName("config")
-	viper.AddConfigPath("config")
-	viper.AutomaticEnv()
-	viper.SetDefault("control", "harmony") // Set default config to harmy for backwards compatibility
-	if err = viper.ReadInConfig(); err != nil {
-		return err
+	cfg, err = loadConfig("config")
+	return err
+}
+
+// loadConfig builds the layered config from configDir/config.yaml, merging
+// configDir/config-dev.yaml on top if dev.enabled is set, then merging
+// $CONFIG_FILE on top of that if present. It uses its own viper instance so
+// it can be called repeatedly (e.g. from tests) without leaking state
+// between calls.
+func loadConfig(configDir string) (result Config, err error) {
+	v := viper.New()
+	v.SetConfigName("config")
+	v.AddConfigPath(configDir)
+	v.AutomaticEnv()
+	v.SetDefault("control", "harmony") // Set default config to harmy for backwards compatibility
+	if err = v.ReadInConfig(); err != nil {
+		return result, err
 	}
-	if err := viper.Unmarshal(&cfg); err != nil {
+	if err := v.Unmarshal(&result); err != nil {
 		log.Printf("Error loading config: %v", err)
-		return err
+		return result, err
 	}
-	if cfg.Dev.Enabled {
-		viper.SetConfigName("config-dev")
-		viper.AddConfigPath("config")
-		if err = viper.MergeInConfig(); err != nil {
+	if result.Dev.Enabled {
+		v.SetConfigName("config-dev")
+		v.AddConfigPath(configDir)
+		if err = v.MergeInConfig(); err != nil {
 			log.Printf("Warning: %v\n", err)
 		}
-		if err := viper.Unmarshal(&cfg); err != nil {
+		if err := v.Unmarshal(&result); err != nil {
 			log.Printf("Error loading config: %v", err)
-			return err
+			return result, err
 		}
 	}
 	// Read a config file from environment if present
 	if os.Getenv("CONFIG_FILE") != "" {
 		log.Printf("Adding config file %v\n", os.Getenv("CONFIG_FILE"))
-		viper.SetConfigFile(os.Getenv("CONFIG_FILE"))
-		if err = viper.MergeInConfig(); err != nil {
+		v.SetConfigFile(os.Getenv("CONFIG_FILE"))
+		if err = v.MergeInConfig(); err != nil {
 			log.Printf("Warning: %v\n", err)
 		}
-		if err := viper.Unmarshal(&cfg); err != nil {
+		if err := v.Unmarshal(&result); err != nil {
 			log.Printf("Error loading config: %v", err)
-			return err
+			return result, err
 		}
 	}
-	return nil
+	if !validControlModes[result.Control] {
+		return result, fmt.Errorf("unknown control mode %q (want one of: harmony, skyq)", result.Control)
+	}
+
+	return result, nil
+}
+
+// validControlModes are the control backends apiCall knows how to dispatch
+// to. Checked at startup so a config typo fails fast instead of only
+// surfacing as a 500 on the first button press.
+var validControlModes = map[string]bool{
+	"harmony":   true,
+	"skyq":      true,
+	"skystream": true,
 }
 
 func main() {
@@ -212,6 +236,15 @@ func apiCall(w http.ResponseWriter, r *http.Request) {
 		// Return a simple success response
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(w, `{"message": "ok"}`)
+	case "skystream":
+		err := sendSkyStreamCommand(r.Context(), cfg.SkyStream, call)
+		if err != nil {
+			http.Error(w, "Unable to send Sky Stream command", http.StatusInternalServerError)
+			log.Printf("Error sending Sky Stream command: %v\n", err)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(w, `{"message": "ok"}`)
 	case "harmony":
 		u := fmt.Sprintf("%v/hubs/%v/commands/%v", cfg.HarmonyApi.Url, cfg.HarmonyApi.DefaultHub, call)
 		data, err := request(r.Context(), http.MethodPost, u)
@@ -230,7 +263,7 @@ func apiCall(w http.ResponseWriter, r *http.Request) {
 		if status.Message != "ok" {
 			msg := fmt.Sprintf("API did not come back OK, returned: %v\n", status.Message)
 			http.Error(w, msg, http.StatusInternalServerError)
-			log.Printf(msg, status.Message)
+			log.Print(msg)
 			return
 		}
 		_ = json.NewEncoder(w).Encode(status)

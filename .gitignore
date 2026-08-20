@@ -2,3 +2,8 @@
 dump.rdb
 config/config-local.yaml
 *.ts
+/slinky
+/app
+*.test
+coverage.out
+/certs/

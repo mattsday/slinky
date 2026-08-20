@@ -44,7 +44,7 @@ To make this work on the internet I strongly recommend using a reverse proxy and
 | Config    | Environment Variable | Description                                                                | Example        |
 | --------- | -------------------- | -------------------------------------------------------------------------- | -------------- |
 | `port`    | `PORT`               | Port for this service to listen on                                         | `PORT=8080`    |
-| `control` | `CONTROL`            | Whether Slinky controls via `harmony` or `skyq` APIs (default: `harmony`). | `CONTROL=skyq` |
+| `control` | `CONTROL`            | Whether Slinky controls via `harmony`, `skyq` or `skystream` APIs (default: `harmony`). | `CONTROL=skyq` |
 
 ### Configure Sky Q
 
@@ -54,6 +54,25 @@ To make this work on the internet I strongly recommend using a reverse proxy and
 | ------------ | -------------------- | --------------------------------------------------------------------- | ------------------------ |
 | `sky_q.host` | `SKY_Q.HOST`         | Your Sky Q box's host IP address or hostname                          | `SKY_Q.HOST=10.86.0.205` |
 | `sky_q.port` | `SKY_Q.PORT`         | The port to connect to your Sky Q Box (will almost always be `49160`) | `SKY_Q.PORT=49160`       |
+
+### Configure Sky Stream
+
+**Note**: This section is optional and can be omitted if you're using Sky Q
+or a Harmony Hub (`control` set to `skyq` or `harmony`).
+
+Sky Stream / Sky Glass boxes speak a different local-network protocol from
+Sky Q (mutual-TLS WebSocket, not a raw TCP command socket). It requires an
+mTLS client certificate and private key, which Slinky does **not** ship or
+generate for you - point it at your own PEM files. See
+[docs/plans/sky-stream-support.md](docs/plans/sky-stream-support.md) for
+where those come from and why they aren't bundled.
+
+| Config                  | Environment Variable    | Description                                             | Example                        |
+| ------------------------ | ------------------------ | --------------------------------------------------------- | --------------------------------- |
+| `sky_stream.host`        | `SKY_STREAM.HOST`        | Your Sky Stream box's host IP address or hostname          | `SKY_STREAM.HOST=10.86.0.206`     |
+| `sky_stream.cert_file`   | `SKY_STREAM.CERT_FILE`   | Path to the mTLS client certificate (PEM)                  | `SKY_STREAM.CERT_FILE=/config/skystream-cert.pem` |
+| `sky_stream.key_file`    | `SKY_STREAM.KEY_FILE`    | Path to the mTLS client private key (PEM)                  | `SKY_STREAM.KEY_FILE=/config/skystream-key.pem`   |
+| `sky_stream.mac`         | `SKY_STREAM.MAC`         | MAC address, for a future Wake-on-LAN enhancement (optional) | `SKY_STREAM.MAC=AA:BB:CC:DD:EE:FF` |
 
 ### Configure Harmony API
 

@@ -1,0 +1,65 @@
+# Built off config-prod.yaml, swapped to control: skystream for real-hardware
+# testing of the Sky Stream backend (see docs/plans/sky-stream-support.md).
+# Deploy the same way as config-prod.yaml: CONFIG_FILE=config/config-stream.yaml,
+# merged on top of the base config.yaml. Revert by pointing CONFIG_FILE back
+# at config-prod.yaml.
+port: 8080
+control: skystream
+sky_q:
+  port: 49160
+  host: 10.86.0.210
+sky_stream:
+  # .122 (ethernet) - the box validated end-to-end this session (WoL, pair,
+  # bind, and a real key command all confirmed working). Change host/mac if
+  # this should target a different box.
+  host: 10.86.0.122
+  mac: "04:b8:6a:f2:e7:4c"
+  # Slinky doesn't vendor these - place your own copies under config/certs/
+  # (gitignored) so the Dockerfile's `COPY config/ /config` picks them up.
+  # See docs/plans/sky-stream-support.md for where they come from.
+  cert_file: /config/certs/sky.xcal.tv-ComcastRDKD2DECCICA1-20260430-20270430.pem
+  key_file: /config/certs/softremote_sky_key.pem
+harmony_api:
+  url: http://10.86.0.10
+  hubs:
+    - name: kitchen
+      activities:
+        - watch-tv
+  default_hub: kitchen
+  default_activity: watch-tv
+stream:
+  quality:
+    - name: High (hevc)
+      location: /stream/0.ts
+      default: true
+    - name: High (h.264)
+      location: /stream/1.ts
+    - name: Medium (hevc)
+      location: /stream/2.ts
+    - name: Low (hevc)
+      location: /stream/3.ts
+  hls:
+  - name: "1080p"
+    location: "https://slinky-video.fragilegeek.com/0.m3u8"
+    bandwidth: 8000000
+    resolution: 1920x1080
+    codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+    frame_rate: 25.000
+  - name: "720p"
+    location: "https://slinky-video.fragilegeek.com/1.m3u8"
+    bandwidth: 4000000
+    resolution: 1280x720
+    codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+    frame_rate: 25.000
+  - name: "480p"
+    location: "https://slinky-video.fragilegeek.com/2.m3u8"
+    bandwidth: 1500000
+    resolution: 854x480
+    codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+    frame_rate: 25.000
+  - name: "360p"
+    location: "https://slinky-video.fragilegeek.com/3.m3u8"
+    bandwidth: 750000
+    resolution: 640x360
+    codecs: "hvc1.1.6.L120.B0,mp4a.40.2"
+    frame_rate: 25.000

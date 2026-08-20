@@ -70,7 +70,14 @@ func sendSkyCommand(host string, port int, command string) error {
 	// Set a deadline for the initial reads to prevent blocking indefinitely.
 	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 
-	// 2. Perform the handshake and command sending sequence.
+	return sendSkyCommandOverConn(conn, code)
+}
+
+// sendSkyCommandOverConn performs the handshake and command-sending sequence
+// against an already-connected socket. Split out from sendSkyCommand so it
+// can be exercised in tests against an in-memory net.Pipe() without a real
+// Sky Q box.
+func sendSkyCommandOverConn(conn net.Conn, code int) error {
 	// This sequence is a direct translation of the NodeJS logic.
 	buffer := make([]byte, 1024)
 	l := 12 // Initial length for the first part of the handshake.

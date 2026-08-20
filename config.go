@@ -4,7 +4,8 @@ type Config struct {
 	Port       string     `mapstructure:"port"`
 	HarmonyApi HarmonyApi `mapstructure:"harmony_api"`
 	SkyQ       SkyQ       `mapstructure:"sky_q"`
-	Control    string     `mapstructure:"control"` // "harmony" or "skyq"
+	SkyStream  SkyStream  `mapstructure:"sky_stream"`
+	Control    string     `mapstructure:"control"` // "harmony", "skyq" or "skystream"
 	Dev        Dev        `mapstructure:"dev"`
 	Stream     Stream     `mapstructure:"stream"`
 }
@@ -12,6 +13,17 @@ type Config struct {
 type SkyQ struct {
 	Host string `mapstructure:"host"`
 	Port int    `mapstructure:"port"`
+}
+
+// SkyStream configures the control: skystream backend (skystream.go /
+// skystream_transport.go). CertFile/KeyFile point at a local mTLS client
+// certificate+key pair - Slinky does not vendor or embed these credentials
+// itself (see docs/plans/sky-stream-support.md for why).
+type SkyStream struct {
+	Host     string `mapstructure:"host"`
+	MAC      string `mapstructure:"mac"` // optional; enables Wake-on-LAN in a future iteration
+	CertFile string `mapstructure:"cert_file"`
+	KeyFile  string `mapstructure:"key_file"`
 }
 
 type HarmonyApi struct {
