@@ -12,6 +12,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -26,7 +27,7 @@ import (
 // to Sky's real embedded certificate - fake box test doubles in this file
 // accept any client cert, mirroring how a Sky Stream box itself only
 // requires *a* client cert be presented (mTLS), not one from a specific CA.
-func generateTestClientCert(t *testing.T) tls.Certificate {
+func generateTestClientCertPEM(t *testing.T) (certPEM, keyPEM []byte) {
 	t.Helper()
 
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -47,18 +48,42 @@ func generateTestClientCert(t *testing.T) tls.Certificate {
 		t.Fatalf("create certificate: %v", err)
 	}
 
-	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
 	keyDER, err := x509.MarshalECPrivateKey(priv)
 	if err != nil {
 		t.Fatalf("marshal key: %v", err)
 	}
-	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER})
+	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER})
+	return certPEM, keyPEM
+}
 
+func generateTestClientCert(t *testing.T) tls.Certificate {
+	t.Helper()
+	certPEM, keyPEM := generateTestClientCertPEM(t)
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
 		t.Fatalf("build tls.Certificate: %v", err)
 	}
 	return cert
+}
+
+// generateTestClientCertFiles writes a fresh self-signed test cert/key pair
+// to files under t.TempDir(), for tests that go through connectSkyStream
+// (which loads the cert from disk via cfg.CertFile/KeyFile) rather than
+// constructing a tls.Certificate directly.
+func generateTestClientCertFiles(t *testing.T) (certPath, keyPath string) {
+	t.Helper()
+	certPEM, keyPEM := generateTestClientCertPEM(t)
+	dir := t.TempDir()
+	certPath = dir + "/cert.pem"
+	keyPath = dir + "/key.pem"
+	if err := os.WriteFile(certPath, certPEM, 0o600); err != nil {
+		t.Fatalf("write cert file: %v", err)
+	}
+	if err := os.WriteFile(keyPath, keyPEM, 0o600); err != nil {
+		t.Fatalf("write key file: %v", err)
+	}
+	return certPath, keyPath
 }
 
 // fakeSkyStreamBox is a local test double for a Sky Stream STB: it speaks
@@ -390,5 +415,60 @@ func TestSendSkyStreamCommand_UnknownCommandErrors(t *testing.T) {
 	err := sendSkyStreamCommand(context.Background(), SkyStream{}, "not-a-real-command")
 	if err == nil {
 		t.Fatal("expected an error for an unknown Sky Stream command, got nil")
+	}
+}
+
+// TestConnectSkyStream_FailedDialAfterWoLHintsAtHostNetworking guards
+// against a real deployment failure mode hit this session: in Docker, a
+// Wake-on-LAN broadcast never crosses a bridge network's NAT boundary, so
+// the box never wakes and the subsequent dial fails with a bare "no route
+// to host" - which gives no clue that network_mode: host is the fix. The
+// error connectSkyStream returns after a WoL attempt must mention it.
+func TestConnectSkyStream_FailedDialAfterWoLHintsAtHostNetworking(t *testing.T) {
+	origReachable := skyStreamReachable
+	origInterval := skyStreamWoLPollInterval
+	origMaxPolls := skyStreamWoLMaxPolls
+	skyStreamReachable = func(addr string) bool { return false } // never wakes
+	skyStreamWoLPollInterval = time.Millisecond
+	skyStreamWoLMaxPolls = 2
+	defer func() {
+		skyStreamReachable = origReachable
+		skyStreamWoLPollInterval = origInterval
+		skyStreamWoLMaxPolls = origMaxPolls
+	}()
+
+	certFile, keyFile := generateTestClientCertFiles(t)
+	// Port 0 on loopback: nothing is listening, so the dial fails fast and
+	// deterministically instead of depending on real network timeouts.
+	cfg := SkyStream{Host: "127.0.0.1", MAC: "04:b8:6a:f2:e7:4c", CertFile: certFile, KeyFile: keyFile}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := connectSkyStream(ctx, cfg)
+	if err == nil {
+		t.Fatal("expected an error dialing a box that never came up, got nil")
+	}
+	if !strings.Contains(err.Error(), "network_mode: host") {
+		t.Errorf("error = %v, want it to mention network_mode: host after a WoL attempt", err)
+	}
+}
+
+// TestConnectSkyStream_FailedDialWithoutWoLHasNoHint confirms the hint only
+// appears when Wake-on-LAN was actually attempted - otherwise it would be
+// misleading noise on a plain unreachable-box error.
+func TestConnectSkyStream_FailedDialWithoutWoLHasNoHint(t *testing.T) {
+	certFile, keyFile := generateTestClientCertFiles(t)
+	cfg := SkyStream{Host: "127.0.0.1", CertFile: certFile, KeyFile: keyFile} // no MAC set
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := connectSkyStream(ctx, cfg)
+	if err == nil {
+		t.Fatal("expected an error dialing a box that isn't listening, got nil")
+	}
+	if strings.Contains(err.Error(), "network_mode: host") {
+		t.Errorf("error = %v, should not mention Wake-on-LAN/host networking when no MAC was configured", err)
 	}
 }

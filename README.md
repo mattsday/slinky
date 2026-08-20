@@ -72,7 +72,14 @@ where those come from and why they aren't bundled.
 | `sky_stream.host`        | `SKY_STREAM.HOST`        | Your Sky Stream box's host IP address or hostname          | `SKY_STREAM.HOST=10.86.0.206`     |
 | `sky_stream.cert_file`   | `SKY_STREAM.CERT_FILE`   | Path to the mTLS client certificate (PEM)                  | `SKY_STREAM.CERT_FILE=/config/skystream-cert.pem` |
 | `sky_stream.key_file`    | `SKY_STREAM.KEY_FILE`    | Path to the mTLS client private key (PEM)                  | `SKY_STREAM.KEY_FILE=/config/skystream-key.pem`   |
-| `sky_stream.mac`         | `SKY_STREAM.MAC`         | MAC address, for a future Wake-on-LAN enhancement (optional) | `SKY_STREAM.MAC=AA:BB:CC:DD:EE:FF` |
+| `sky_stream.mac`         | `SKY_STREAM.MAC`         | MAC address; enables Wake-on-LAN if the box is unreachable (optional) | `SKY_STREAM.MAC=AA:BB:CC:DD:EE:FF` |
+
+**If you set `sky_stream.mac`**, Slinky's container needs `network_mode: host`
+in your `docker-compose.yaml` (see `samples/docker-compose.yaml`). A Wake-on-LAN
+packet is a UDP broadcast, and broadcasts never cross Docker's bridge network
+NAT boundary — without host networking, the WoL packet never reaches your LAN
+at all, and the box never wakes. Not needed for `control: skyq` or `harmony`
+(no broadcast involved), or if you leave `sky_stream.mac` unset.
 
 ### Configure Harmony API
 

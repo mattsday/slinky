@@ -10,4 +10,11 @@ services:
       - HARMONY_API.URL=http://<url>:8282
       - HUBS.DEFAULT_HUB=<hub>
       - HUBS.DEFAULT_ACTIVITY=<activity>
+    # Required if control: skystream and sky_stream.mac is set: a UDP
+    # broadcast (Wake-on-LAN) never crosses Docker's bridge network NAT
+    # boundary, so the container needs to be genuinely on the LAN, not
+    # behind it, for WoL to actually reach the box. Not needed for
+    # control: skyq or harmony (no broadcast involved). Same reason
+    # samples/harmony-api/docker-compose.yaml uses this.
+    # network_mode: host
     restart: unless-stopped

@@ -177,6 +177,25 @@ chasing from this codebase.
 `Dismiss`; `menu` → `AccessMenu` vs. `Home`) haven't specifically been
 exercised yet - only `Info` has been real-hardware-verified so far.
 
+**Real-deployment regression found and fixed**: deploying `config-stream.yaml`
+to the actual production docker-compose (bridge-networked, not the
+`--network host` sibling container used for testing in this session) hit
+exactly the WoL-broadcast-can't-cross-a-bridge-network issue predicted
+above: `.122` was asleep, `sendWakeOnLAN` fired but never reached the LAN,
+and the subsequent dial failed with a bare `no route to host` giving no
+clue why. Two fixes landed from this:
+
+- `samples/docker-compose.yaml` and the README's Sky Stream config section
+  now both document that `network_mode: host` is required whenever
+  `sky_stream.mac` is set, matching the precedent already set by
+  `samples/harmony-api/docker-compose.yaml`.
+- `connectSkyStream`'s error now says so directly: if a dial fails after a
+  WoL attempt, the error is wrapped with a hint pointing at
+  `network_mode: host`, tested in
+  `TestConnectSkyStream_FailedDialAfterWoLHintsAtHostNetworking` (and
+  `..._WithoutWoLHasNoHint` confirms it stays out of unrelated errors).
+  Total: 52 tests.
+
 ## Raising the bar on Sky Stream testability
 
 The original [sky-stream-support.md](sky-stream-support.md) treated the

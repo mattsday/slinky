@@ -264,6 +264,9 @@ func connectSkyStream(ctx context.Context, cfg SkyStream) (*skyStreamSession, er
 	origin := fmt.Sprintf("https://%s:8091/", cfg.Host)
 	conn, err := dialSkyStream(ctx, skyStreamDialConfig{URL: u.String(), ServerName: "sky.xcal.tv", Origin: origin, Cert: cert})
 	if err != nil {
+		if woke {
+			return nil, fmt.Errorf("%w (a Wake-on-LAN packet was sent but the box never became reachable - if Slinky is running in Docker, this usually means the container needs network_mode: host, since a WoL broadcast can't cross a bridge network's NAT boundary; see docs/plans/sky-stream-support.md)", err)
+		}
 		return nil, err
 	}
 
